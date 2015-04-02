@@ -1,0 +1,11 @@
+# Logs
+*.log
+
+# Coverage reports directory
+coverage/
+
+# Dependency directory
+node_modules/
+
+# IntelliJ project files
+.idea/

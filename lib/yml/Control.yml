@@ -1,0 +1,27 @@
+---
+
+group:
+
+  name: Control
+
+  description: |
+
+    Includes "Stop" "Help" and "GetInfo"
+
+methods:
+
+  - name: GetInfo
+    description: Get state information about the server
+    result: Info
+
+  - name: Help
+    description: Get usage information for an RPC method
+    params:
+      - name: method
+        type: String
+        optional: yes
+    result: String
+    public: yes
+
+  - name: Stop
+    description: Stop the server

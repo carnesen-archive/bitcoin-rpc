@@ -1,0 +1,84 @@
+---
+
+group:
+
+  name: BlockChain
+
+  public: yes
+
+  description: |
+
+    Block chain operations and infomation
+
+methods:
+
+  - name: GetBestBlockHash
+    description: Hash of the best (tip) block in the longest block chain
+    result: Hash
+
+  - name: GetBlock
+    params:
+      - name: id
+        type: Hash
+        description: Hash of the block
+    result: Block
+
+  - name: GetBlockChainInfo
+    description: Get information about block chain processing
+    result: ChainInfo
+
+  - name: GetBlockCount
+    description: Get the number of blocks in the longest block chain
+    result: Int
+
+  - name: GetBlockHash
+    description: Get hash of block in best-block-chain at index provided
+    params:
+      - name: index
+        type: Int
+        description: Block index (height)
+    result: Hash
+
+  - name: GetChainTips
+    description: Get information about all known tips in the block tree
+    result: ChainTips
+
+  - name: GetDifficulty
+    description: Proof-of-work difficulty as a multiple of the minimum
+    result: Float
+
+  - name: GetMemPoolInfo
+    description: Details on the active state of the TX memory pool.
+    result: MemPoolInfo
+
+  - name: GetRawMemPool
+    description: List of transactions in the memory pool
+    result: HashArray
+
+  - name: GetTxOut
+    description: Get details about an unspent transaction result
+    params:
+      - name: txid
+        type: Hash
+        description: Hash of the transaction
+      - name: vout
+        type: Int
+      - name: includeMemPool
+        type: Boolean
+    result: UtxoInfo
+
+  - name: GetTxOutSetInfo
+    description: Get details about the unspent transaction result set
+    result: UtxoSetInfo
+
+  - name: VerifyChain
+    description: Verifies the block chain database
+    public: no
+    params:
+      - name: checkLevel
+        type: Int
+        description: How thorough the block veification is (0-4)
+      - name: nBlocks
+        type: Int
+        description: The number of blocks to check
+    result: Boolean

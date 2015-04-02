@@ -1,0 +1,7 @@
+---
+
+client:
+  host: localhost
+  username: username
+  password: password
+  port: 8332
