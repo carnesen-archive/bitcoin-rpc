@@ -2,8 +2,8 @@
 
 var should = require('chai').should();
 
-var Requests = require('../../lib/requests');
-var Spec = require('../../lib/spec/index');
+var Requests = require('../lib/requests');
+var Spec = require('../lib/spec/index');
 
 describe('Requests', function() {
 

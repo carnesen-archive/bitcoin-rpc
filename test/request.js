@@ -3,7 +3,7 @@
 var chai = require('chai');
 var should = chai.should();
 
-var Request = require('../../lib/request');
+var Request = require('../lib/request');
 
 describe('Request', function() {
 
@@ -37,6 +37,11 @@ describe('Request', function() {
   it('can be set to jsonrpc 2.0', function() {
     requestMock.jsonRpc = Request.JSON_RPC_2;
     requestMock.serialize().should.include.keys('jsonrpc');
+  });
+
+  it('default handler is a pass-through function', function() {
+    var request = new Request();
+    request.handler('foo').should.equal('foo');
   });
 
 });
