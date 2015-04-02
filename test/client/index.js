@@ -54,7 +54,7 @@ describe('Client', function() {
 
   it('sendRequest returns error on sendJson error', function (done) {
     httpClientMock.sendJson = function(json, cb) {
-      process.nextTick(cb('foo'))
+      process.nextTick(function() { cb('foo'); });
     };
     clientMock.sendRequest(requestMock, function(err) {
       err.should.be.equal('foo');

@@ -3,6 +3,7 @@
 var should = require('chai').should();
 
 var Requests = require('../lib/requests');
+var Request = require('../lib/request');
 var Spec = require('../lib/spec/index');
 
 describe('Requests', function() {
@@ -13,7 +14,9 @@ describe('Requests', function() {
     specMock.loadMethodGroup({
       groups: [],
       methods: [{
-        name: 'Foo'
+        name: 'Foo',
+        params: [{ name: 'P', type: 'Hash'}],
+        result: 'Hash'
       }]
     });
     requestsMock = new Requests(specMock);
@@ -29,7 +32,22 @@ describe('Requests', function() {
   });
 
   it('creates a requests method for each method provided ', function() {
-    requestsMock.Foo.should.be.a('function')
+    var fn = function() { requestsMock.Foo(['beef']) };
+    fn.should.not.throw();
+  });
+
+  it('requests method should return a Request instance', function() {
+    requestsMock.Foo(['beef']).should.be.an.instanceof(Request);
+  });
+
+  it('requests method should set up proper result handler', function() {
+    var result = requestsMock.Foo(['beef']).handler('beef');
+    result.should.be.an.instanceof(Buffer);
+    result.toString('hex').should.equal('beef');
+  });
+
+  it('requests method should set method name properly', function() {
+    requestsMock.Foo(['beef']).method.should.equal('Foo');
   });
 
 });
