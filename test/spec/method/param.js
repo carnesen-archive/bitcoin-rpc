@@ -34,4 +34,15 @@ describe('Param', function() {
     param.serialize.bind(param).should.throw('Invalid Argument');
   });
 
+  var types = [];
+  for (var type in Param.TYPES) {
+    types.push(type);
+  }
+  types.forEach(function(type){
+    it('has type ' + type, function() {
+      var param = Param.create({ name: 'foo', type: type });
+      param.serialize('bar').should.equal('bar');
+    });
+  });
+
 });
