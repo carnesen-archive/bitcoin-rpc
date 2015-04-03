@@ -8,7 +8,6 @@ var Spec = require('../../lib/spec');
 describe('Check YAML specifications', function() {
 
   var spec = Spec.create();
-  spec.loadDirectory(__dirname + '/../../lib/yml');
 
   var checkParams = function(params) {
     params.serialize.should.be.a('function');

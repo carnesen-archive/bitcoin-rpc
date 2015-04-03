@@ -21,17 +21,15 @@ describe('Spec', function() {
     should.exist(spec)
   });
 
-  it('has no methods or groups by default', function() {
-    specMock.methods.should.have.length(0);
-    specMock.groups.should.have.length(0);
+  it('instantiates from create with directory', function() {
+    var spec = Spec.create(__dirname);
+    spec.methods.should.have.length(0);
+    spec.groups.should.have.length(0);
   });
 
-  it('can load a method group', function() {
-    specMock.loadMethodGroup({
-      group: { name: 'asdf', description: 'fdsa' },
-      methods: [
-        { name: 'mfoo'}
-      ]
-    })
+  it('loads all the yml methods and groups by default', function() {
+    specMock.methods.should.have.length.above(0);
+    specMock.groups.should.have.length.above(0);
   });
+
 });
