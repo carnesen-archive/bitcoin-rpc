@@ -8,8 +8,9 @@ var mocha = require('gulp-mocha');
 var shell = require('gulp-shell');
 
 var files = ['lib/**/*.js'];
-var tests = ['test/**/*.js'];
-var alljs = files.concat(tests);
+var unitTests = ['test/**/*.js'];
+var integrationTests = ['integration/**/*.js'];
+var alljs = files.concat(unitTests).concat(integrationTests);
 
 var buildBinPath = './node_modules/.bin/';
 
@@ -18,7 +19,11 @@ var buildBinPath = './node_modules/.bin/';
  */
 
 gulp.task('test:node', function() {
-  return gulp.src(tests).pipe(new mocha({ reporter: 'spec' }));
+  return gulp.src(unitTests).pipe(new mocha({ reporter: 'spec' }));
+});
+
+gulp.task('test:integration', function() {
+  return gulp.src(integrationTests).pipe(new mocha({ reporter: 'spec' }));
 });
 
 gulp.task('test', ['test:node']);
