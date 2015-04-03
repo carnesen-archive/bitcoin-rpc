@@ -40,12 +40,20 @@ describe('Requests', function() {
     requestsMock.Foo(['beef']).should.be.an.instanceof(Request);
   });
 
-  //it('requests method should set up proper result handler', function() {
-  //  var result = requestsMock.Foo(['beef']).callback('beef');
-  //  result.should.be.an.instanceof(Buffer);
-  //  result.toString('hex').should.equal('beef');
-  //});
-  //
+  it('method-created request calls back error', function() {
+    var request = requestsMock.Foo(['beef'], function(err) {
+      return(err);
+    });
+    request.callback('foo').should.equal('foo');
+  });
+
+  it('method-created request calls back deserialized result', function() {
+    var request = requestsMock.Foo(['beef'], function(err, ret) {
+      return(ret);
+    });
+    request.callback(null, 'beef').toString('hex').should.equal('beef');
+  });
+
   it('requests method should set method name properly', function() {
     requestsMock.Foo(['beef']).method.should.equal('Foo');
   });
