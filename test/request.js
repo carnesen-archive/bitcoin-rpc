@@ -38,11 +38,6 @@ describe('Request', function() {
     request.serialize().should.include.keys('jsonrpc');
   });
 
-  it('has default no-op callback', function() {
-    var request = new Request();
-    request.callback.should.not.throw();
-  });
-
   it('calls back "Invalid response" if response ID differs from request', function(done) {
     requestMock.callback = function(err) {
       err.message.should.equal('Invalid response');
