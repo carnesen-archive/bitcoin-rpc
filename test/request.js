@@ -34,7 +34,7 @@ describe('Request', function() {
   });
 
   it('can be set to jsonrpc 2.0', function() {
-    var request = Request.create({jsonRpc: Request.JSON_RPC_2});
+    var request = Request.create({method: 'Foo', jsonRpc: Request.JSON_RPC_2});
     request.serialize().should.include.keys('jsonrpc');
   });
 

@@ -11,7 +11,8 @@ describe('Param', function() {
   beforeEach(function() {
     paramMock = new Param({
       name: 'foo',
-      type: 'Hash'
+      type: 'Hash',
+      position: 1
     })
   });
 

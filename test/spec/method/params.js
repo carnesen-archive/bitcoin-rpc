@@ -12,32 +12,40 @@ describe('Params', function() {
     type: 'Hash'
   }]);
 
-  it('Instantiates from constructor', function() {
+  it('instantiates from constructor', function() {
     var params = new Params();
     should.exist(params);
   });
 
-  it('Instantiates from create', function() {
+  it('instantiates from create', function() {
     var params = Params.create();
     should.exist(params);
   });
 
-  it('Instantiates from create with arguments', function() {
+  it('instantiates from create with arguments', function() {
     should.exist(paramsMock);
   });
 
-  it('Serialize should throw expected number of arguments', function() {
+  it('serialize should throw expected number of arguments', function() {
     paramsMock.serialize.bind(paramsMock).should.throw('Expected 1 arguments');
   });
 
-  it('Serialize should throw "Unknown type"', function() {
-    var fn = function() { paramsMock.serialize({}) };
+  it('serialize should throw "Unknown type"', function() {
+    var fn = function() { paramsMock.serialize('string') };
     fn.should.throw('Unknown type');
   });
 
-  it('Serializes an array', function() {
-    paramsMock.serialize(['0']);
+  it('serializes an array', function() {
+    paramsMock.serialize(['0'])[0].should.equal('0');
   });
 
+  it('serializes an object', function() {
+    paramsMock.serialize({foo: 'beef'})[0].should.equal('beef');
+  });
+
+  it('throws an error if param name is unknown', function() {
+    var fn = function() { paramsMock.serialize({fo: 'beef'})};
+    fn.should.throw('Unknown parameter');
+  });
 
 });

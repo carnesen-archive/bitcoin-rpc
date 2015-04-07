@@ -12,11 +12,11 @@ describe('Client', function() {
   var clientMock, requestMock, httpClientMock;
   beforeEach(function() {
     requestMock = Request.create();
+    requestMock.handleResponse = sinon.spy();
     requestMock.serialize = sinon.spy();
-    requestMock.handler = sinon.spy();
     httpClientMock = {
       sendJson: function(json, cb) {
-        process.nextTick(function() { cb(null, '') });
+        process.nextTick(function() { cb(null, '{error: null, result: "beef"') });
       }
     };
     clientMock = Client.create();
@@ -38,28 +38,19 @@ describe('Client', function() {
     should.exist(client);
   });
 
-  it('sendRequest calls callback on success', function (done) {
-    clientMock.sendRequest(requestMock, function() { done(); });
-  });
-
   it('sendRequest serializes the request', function () {
     clientMock.sendRequest(requestMock);
     requestMock.serialize.calledOnce.should.equal(true);
   });
 
-  it('sendRequest calls the request handler', function (done) {
-    requestMock.handler = function() { done() };
-    clientMock.sendRequest(requestMock);
-  });
-
-  it('sendRequest returns error on sendJson error', function (done) {
+  it('sendRequest calls error on sendJson error', function (done) {
     httpClientMock.sendJson = function(json, cb) {
-      process.nextTick(function() { cb('foo'); });
+      cb('bad');
     };
-    clientMock.sendRequest(requestMock, function(err) {
-      err.should.be.equal('foo');
+    requestMock.callback = function(err, ret) {
       done();
-    });
+    };
+    clientMock.sendRequest(requestMock)
   });
 
 });
