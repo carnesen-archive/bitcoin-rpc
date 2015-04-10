@@ -35,15 +35,25 @@ describe('Param', function() {
     param.serialize.bind(param).should.throw('Invalid Argument');
   });
 
-  var types = [];
-  for (var type in Param.TYPES) {
-    types.push(type);
-  }
-  types.forEach(function(type){
-    it('has type ' + type, function() {
-      var param = Param.create({ name: 'foo', type: type });
-      param.serialize('bar').should.equal('bar');
-    });
+  it('has String type', function() {
+    var param = Param.create({ name: 'foo', type: 'String' });
+    param.serialize('bar').should.equal('bar');
+  });
+
+  it('has Hash type', function() {
+    var param = Param.create({ name: 'foo', type: 'Hash' });
+    param.serialize(new Buffer('beef', 'hex')).should.equal('beef');
+  });
+
+  it('has Int type', function() {
+    var param = Param.create({ name: 'foo', type: 'Int' });
+    param.serialize(1).should.equal(1);
+    param.serialize(' 1.0 ').should.equal(1);
+  });
+
+  it('has Boolean type', function() {
+    var param = Param.create({ name: 'foo', type: 'Boolean' });
+    param.serialize(true).should.equal(true);
   });
 
 });
