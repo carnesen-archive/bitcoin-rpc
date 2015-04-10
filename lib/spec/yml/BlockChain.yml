@@ -21,6 +21,9 @@ methods:
       - name: id
         type: Hash
         description: Hash of the block
+      - name: verbose
+        type: Boolean
+        description: yes for block information, no for actual block
     result: Block
 
   - name: GetBlockChainInfo
@@ -53,7 +56,11 @@ methods:
 
   - name: GetRawMemPool
     description: List of transactions in the memory pool
-    result: HashArray
+    params:
+      - name: verbose
+        type: Boolean
+        description: true for details about each transaction, false for hash only
+    result: RawMemPool
 
   - name: GetTxOut
     description: Get details about an unspent transaction result
