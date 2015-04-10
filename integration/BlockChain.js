@@ -20,7 +20,7 @@ describe('BlockChain', function() {
   });
 
   it('GetBlock verbose', function (done) {
-    var request = requests.GetBlock([blockHash, true]);
+    var request = requests.GetBlock(blockHash, true);
     client.sendRequest(request, function(err, ret) {
       ret.nConfirmations.should.be.above(0);
       done();
@@ -28,7 +28,7 @@ describe('BlockChain', function() {
   });
 
   it('GetBlock', function (done) {
-    var request = requests.GetBlock([blockHash, false]);
+    var request = requests.GetBlock(blockHash, false);
     client.sendRequest(request, function(err, ret) {
       ret.hash.should.equal(blockHash);
       done();
@@ -52,7 +52,7 @@ describe('BlockChain', function() {
   });
 
   it('GetBlockHash', function (done) {
-    var request = requests.GetBlockHash([0]);
+    var request = requests.GetBlockHash(0);
     client.sendRequest(request, function(err, ret) {
       ret.toString('hex').should.equal(blockHash);
       done();
@@ -84,7 +84,7 @@ describe('BlockChain', function() {
   });
 
   it('GetRawMemPool', function (done) {
-    var request = requests.GetRawMemPool([false]);
+    var request = requests.GetRawMemPool({verbose: false});
 
     client.sendRequest(request, function(err, ret) {
       ret.forEach(function(txid){
@@ -95,7 +95,7 @@ describe('BlockChain', function() {
   });
 
   it('GetRawMemPool verbose', function (done) {
-    var request = requests.GetRawMemPool([true]);
+    var request = requests.GetRawMemPool(true);
 
     client.sendRequest(request, function(err, ret) {
       for(var txid in ret) {

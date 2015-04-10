@@ -11,7 +11,8 @@ describe('Request', function() {
   var requestMock;
   beforeEach(function() {
     requestMock = Request.create({
-      method: Method.create({name: 'Foo'}, {name: 'GroupX'})
+      method: Method.create({name: 'Foo'}, {name: 'GroupX'}),
+      args: []
     });
   });
 

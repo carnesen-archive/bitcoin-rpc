@@ -30,9 +30,8 @@ describe('Params', function() {
     paramsMock.serialize.bind(paramsMock).should.throw('Expected 1 arguments');
   });
 
-  it('serialize should throw "Unknown type"', function() {
-    var fn = function() { paramsMock.serialize('string') };
-    fn.should.throw('Unknown type');
+  it('serialize should package arguments into an array', function() {
+    paramsMock.serialize('a string')[0].should.equal('a string');
   });
 
   it('serializes an array', function() {
