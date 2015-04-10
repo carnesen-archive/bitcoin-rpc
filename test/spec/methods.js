@@ -3,11 +3,9 @@
 var chai = require('chai');
 var should = chai.should();
 
-var Spec = require('../../lib/spec');
+var methods = require('../../lib/spec/methods');
 
-describe('Check YAML specifications', function() {
-
-  var spec = Spec.create();
+describe('methods', function() {
 
   var checkParams = function(params) {
     params.serialize.should.be.a('function');
@@ -39,19 +37,11 @@ describe('Check YAML specifications', function() {
     checkResult(method.result);
     method.public.should.be.a('boolean');
     checkParams(method.params);
-    method.group.should.be.a('string');
+    checkGroup(method.group);
   };
 
-  describe('Method checks', function () {
-    spec.methods.forEach(function(method) {
-      it(method.name, function() { checkMethod(method); })
-    });
-  });
-
-  describe('Group checks', function () {
-    spec.groups.forEach(function(group) {
-      it(group.name, function() { checkGroup(group); })
-    });
+  methods.forEach(function(method) {
+    it(method.name, function() { checkMethod(method); })
   });
 
 });

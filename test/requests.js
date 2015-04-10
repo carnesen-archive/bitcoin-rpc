@@ -3,59 +3,35 @@
 var should = require('chai').should();
 
 var Requests = require('../lib/requests');
-var Request = require('../lib/request');
-var Spec = require('../lib/spec/index');
+var methods = require('../lib/spec/methods');
 
 describe('Requests', function() {
 
-  var requestsMock, specMock;
-  beforeEach(function() {
-    specMock = new Spec();
-    specMock.loadMethodGroup({
-      groups: [],
-      methods: [{
-        name: 'Foo',
-        params: [{ name: 'P', type: 'Hash'}],
-        result: 'Hash'
-      }]
-    });
-    requestsMock = new Requests(specMock);
+  it('instantiates from constructor', function () {
+    var r = new Requests();
+    should.exist(r);
   });
 
-  it('instantiates from constructor', function() {
-    should.exist(requestsMock);
+  it('instantiates from create', function () {
+    var r = Requests.create();
+    should.exist(r);
   });
+});
 
-  it('instantiates from create', function() {
-    var requests = Requests.create();
-    should.exist(requests);
-  });
+describe('requests', function() {
 
-  it('creates a requests method for each method provided ', function() {
-    var fn = function() { requestsMock.Foo(['beef']) };
+  var requests = new Requests();
+
+  function checkRequestsMethod(method) {
+    var fn = function() {
+      var args = method.params.map(function() { return ''});
+      requests[method.name](args);
+    };
     fn.should.not.throw();
-  });
+  }
 
-  it('requests method should return a Request instance', function() {
-    requestsMock.Foo(['beef']).should.be.an.instanceof(Request);
-  });
-
-  it('method-created request calls back error', function() {
-    var request = requestsMock.Foo(['beef'], function(err) {
-      return(err);
-    });
-    request.callback('foo').should.equal('foo');
-  });
-
-  it('method-created request calls back deserialized result', function() {
-    var request = requestsMock.Foo(['beef'], function(err, ret) {
-      return(ret);
-    });
-    request.callback(null, 'beef').toString('hex').should.equal('beef');
-  });
-
-  it('requests method should set method name properly', function() {
-    requestsMock.Foo(['beef']).method.should.equal('Foo');
+  methods.forEach(function(method) {
+    it(method.name, function() { checkRequestsMethod(method); })
   });
 
 });

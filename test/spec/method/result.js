@@ -3,7 +3,7 @@
 var chai = require('chai');
 var should = chai.should();
 
-var Result = require('../../../lib/spec/method/result/index');
+var Result = require('../../../lib/spec/method/result');
 
 describe('Result types', function() {
 
@@ -11,7 +11,7 @@ describe('Result types', function() {
   beforeEach(function() {
     resultMock = new Result();
   });
-  
+
   it('instantiates from constructor', function() {
     should.exist(resultMock)
   });
@@ -54,9 +54,9 @@ describe('Result types', function() {
   });
 
   it('deserializes a ChainTips object', function() {
-    var obj = JSON.parse('[{"height":350152,"hash":"0000000000000000032de7060a125cf122315713ceff4b7acb8fc7f24cdb1a82","branchlen":1,"status":"headers-only"},{"height":350151,"hash":"000000000000000010f068da88d60fa5b606a8a17a70f10ba4b31834372f5e08","branchlen":0,"status":"active"},{"height":349844,"hash":"0000000000000000127825ede10ee446409ed45b877102e01b3419238723cdb8","branchlen":1,"status":"valid-headers"},{"height":349381,"hash":"00000000000000000f96353e54291354c800bb6b7b74b2d50287fe80de630ab6","branchlen":1,"status":"valid-headers"},{"height":349073,"hash":"00000000000000000814d4017c1e5cb6e0356a0afe3d3c2df9b297f81fb8887c","branchlen":1,"status":"valid-headers"},{"height":349012,"hash":"00000000000000000f13059bcfbb63896365273a8360b60ead58a5e623d0555c","branchlen":1,"status":"valid-fork"},{"height":348323,"hash":"00000000000000000811b958ae99a783e29cd8be33b266b3716cc96f5758c560","branchlen":2,"status":"valid-headers"},{"height":348234,"hash":"000000000000000007b73d1dd03cd355fe279a690996f65607f8bd71cf2e94c5","branchlen":1,"status":"valid-headers"},{"height":347915,"hash":"000000000000000015d5ab1da595af39a41e251fbbfeba6fd6329b8bc174dc56","branchlen":1,"status":"valid-headers"},{"height":347508,"hash":"00000000000000000f329e6fb8d85af6096ac0beeba36cb7cee27d6b72584c6b","branchlen":1,"status":"valid-fork"},{"height":347167,"hash":"0000000000000000071412f6831a0f03b5abfb7490e8a4dfa13c82d6805096f1","branchlen":1,"status":"valid-fork"},{"height":347110,"hash":"000000000000000006330b6072ad80ffb03924dafef7d01fd099d4ebd051457c","branchlen":1,"status":"valid-fork"},{"height":346319,"hash":"0000000000000000051df08a973095ac3e4db9fcf55aabba3c869d3eb588cf3f","branchlen":1,"status":"valid-headers"},{"height":346310,"hash":"000000000000000000853b74b4ba57ffe5a5bd711e298c615ffbece916e43805","branchlen":1,"status":"valid-headers"},{"height":345711,"hash":"00000000000000001607d9d8e49e3958923f1b6a4ebd465dea0fc5f92596c3a1","branchlen":1,"status":"valid-fork"},{"height":345603,"hash":"000000000000000003e14626f77a919aef071b3ee4983eb536cfaffaadd916f6","branchlen":1,"status":"valid-headers"},{"height":344949,"hash":"0000000000000000047b1d4d9fe55b1f760ccebd18b6c0df6f44ec8e109fe26c","branchlen":1,"status":"valid-fork"},{"height":344102,"hash":"00000000000000000f3f190cc07acf0954257a067c816b12fa146257196f6208","branchlen":1,"status":"valid-headers"},{"height":344083,"hash":"000000000000000017872b73085231b313a5650cedb84f5eb07720b5072151e0","branchlen":1,"status":"valid-headers"},{"height":343611,"hash":"00000000000000000c22cecee194f817c576aaf1e257fc7f7687e62ac61235ce","branchlen":1,"status":"valid-headers"},{"height":343040,"hash":"0000000000000000178c36d05055451ed54ddf0a7aa16254dd5a0f4ad6a9b696","branchlen":1,"status":"valid-headers"},{"height":342894,"hash":"0000000000000000107d44a08b8ac2c49ff63e21db1b2e25bf52c39ae01093c2","branchlen":1,"status":"valid-headers"},{"height":341975,"hash":"00000000000000000d1ad922242c25d4b453a23aa92e61cabb3c6ace6a5feb96","branchlen":1,"status":"valid-headers"},{"height":341878,"hash":"0000000000000000185a0231847cb73c879e6748f1ee55595cb718bdf253358a","branchlen":1,"status":"valid-fork"},{"height":341517,"hash":"0000000000000000036cdca9dacebc0c4adda60fe356bac499e4d68f26c4fc17","branchlen":1,"status":"valid-headers"},{"height":341377,"hash":"000000000000000016aac6dabc230dd8255588b6bc90b6272ef5c146b78539dd","branchlen":1,"status":"valid-headers"},{"height":339997,"hash":"000000000000000005f091f1cd179e0778e1cc100602c3b4214a9a3de902c7be","branchlen":1,"status":"valid-fork"},{"height":338253,"hash":"000000000000000017232ad82611afd3d71dd603e0c59e3ab64b0c46ae98d32d","branchlen":1,"status":"valid-headers"},{"height":338201,"hash":"00000000000000001af1d128a22cb75af69e9a371d95a311a1f9607c96fe9d7c","branchlen":1,"status":"valid-headers"},{"height":338104,"hash":"00000000000000000a94800d048597fbca04b8ddcdeca57c32b47a3d5d21929a","branchlen":1,"status":"valid-headers"},{"height":338076,"hash":"0000000000000000150a61a673d507abd74c2f7ea3ec2b872ef7b893af3035c7","branchlen":1,"status":"valid-fork"},{"height":337825,"hash":"0000000000000000047b08613012d1961773968c620663f06ecb23fa5043403c","branchlen":1,"status":"valid-fork"},{"height":337487,"hash":"00000000000000001210610f61d4661422395cfb10f0946921e80d6825275c07","branchlen":1,"status":"valid-headers"},{"height":337487,"hash":"00000000000000001aad4da61bba2d712f43226c439ce55c8336e659e81aadb4","branchlen":1,"status":"valid-fork"}]')
+    var obj = JSON.parse('[{"height":350152,"branchlen":1,"status":"valid-fork"},{"height":337825,"hash":"0000000000000000047b08613012d1961773968c620663f06ecb23fa5043403c","branchlen":1,"status":"valid-fork"},{"height":337487,"hash":"00000000000000001210610f61d4661422395cfb10f0946921e80d6825275c07","branchlen":1,"status":"valid-headers"},{"height":337487,"hash":"00000000000000001aad4da61bba2d712f43226c439ce55c8336e659e81aadb4","branchlen":1,"status":"valid-fork"}]')
     var result = Result.create('ChainTips');
-    result.deserialize(obj)[0].statusDescription.should.equal('Not all blocks for this branch are available, but the headers are valid')
+    result.deserialize(obj)[0].statusDescription.should.equal('This branch is not part of the active chain, but is fully validated')
   });
 
   it('deserializes an Info object', function() {

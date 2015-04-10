@@ -3,33 +3,20 @@
 var chai = require('chai');
 var should = chai.should();
 
-var Spec = require('../../lib/spec');
+var spec = require('../../lib/spec');
 
-describe('Spec', function() {
+describe('spec', function() {
 
-  var specMock;
-  beforeEach(function() {
-    specMock = new Spec();
+  it('exports methods', function() {
+    should.exist(spec.methods)
   });
 
-  it('instantiates from constructor', function() {
-    should.exist(specMock)
+  it('exports Response', function() {
+    should.exist(spec.Response)
   });
 
-  it('instantiates from create', function() {
-    var spec = Spec.create();
-    should.exist(spec)
-  });
-
-  it('instantiates from create with directory', function() {
-    var spec = Spec.create(__dirname);
-    spec.methods.should.have.length(0);
-    spec.groups.should.have.length(0);
-  });
-
-  it('loads all the yml methods and groups by default', function() {
-    specMock.methods.should.have.length.above(0);
-    specMock.groups.should.have.length.above(0);
+  it('exports Request', function() {
+    should.exist(spec.Request)
   });
 
 });

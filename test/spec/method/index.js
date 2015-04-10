@@ -2,7 +2,7 @@
 
 var should = require('chai').should();
 
-var Method = require('../../../lib/spec/method/index');
+var Method = require('../../../lib/spec/method');
 
 describe('Method', function() {
 

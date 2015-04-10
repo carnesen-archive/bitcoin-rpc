@@ -15,11 +15,10 @@ describe('Integration tests:', function() {
   });
 
   it('GetInfo', function (done) {
-    client.sendRequest(requests.GetInfo([], function(err, ret) {
-      console.log(err);
+    client.sendRequest(requests.GetInfo(), function(err, ret) {
       ret.nConnections.should.be.above(-1);
       done();
-    }))
+    })
   });
 
 });
