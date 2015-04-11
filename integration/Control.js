@@ -18,4 +18,13 @@ describe('Control:', function() {
     })
   });
 
+  it('Help', function (done) {
+    client.sendRequest(requests.Help('GetInfo'), function(err, ret) {
+      ret.should.contain('bitcoin-cli getinfo');
+      done();
+    })
+  });
+
+  // Stop tested separately
+
 });

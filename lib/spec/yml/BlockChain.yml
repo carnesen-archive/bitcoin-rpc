@@ -65,13 +65,14 @@ methods:
   - name: GetTxOut
     description: Get details about an unspent transaction result
     params:
-      - name: txid
+      - name: txId
         type: Hash
         description: Hash of the transaction
-      - name: vout
+      - name: vOut
         type: Int
       - name: includeMemPool
         type: Boolean
+        description: whether or not to include mempool transactions
     result: UtxoInfo
 
   - name: GetTxOutSetInfo

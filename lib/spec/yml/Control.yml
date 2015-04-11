@@ -18,8 +18,8 @@ methods:
     description: Get usage information for an RPC method
     params:
       - name: method
-        type: String
-        optional: yes
+        type: MethodName
+        description: name of the method
     result: String
     public: yes
 

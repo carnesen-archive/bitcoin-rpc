@@ -110,4 +110,30 @@ describe('BlockChain', function() {
     })
   });
 
+  it('GetTxOut', function (done) {
+    var memPoolRequest = requests.GetRawMemPool(false);
+    client.sendRequest(memPoolRequest, function(err, ret) {
+      var txId = ret[0];
+      var request = requests.GetTxOut({
+        txId: txId,
+        vOut: 0,
+        includeMemPool: true
+      });
+      client.sendRequest(request, function(e, r) {
+        r.nConfirmations.should.equal(0);
+        done();
+      })
+    })
+  });
+
+  // GetTxOutSetInfo takes too long
+
+  it('VerifyChain', function (done) {
+    client.sendRequest(requests.VerifyChain(0,1), function(err, ret) {
+      ret.should.equal(true);
+      done();
+    })
+  });
+
+
 });

@@ -56,4 +56,9 @@ describe('Param', function() {
     param.serialize(true).should.equal(true);
   });
 
+  it('has MethodName type', function() {
+    var param = Param.create({ name: 'foo', type: 'MethodName' });
+    param.serialize('ASDF').should.equal('asdf');
+  });
+
 });
