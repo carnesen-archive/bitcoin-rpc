@@ -39,7 +39,11 @@ describe('Field', function() {
   });
 
   it('has type Object if provided an Object for its type', function() {
-    f = Field.create('foo', { type: { subFoo: 'Bar'} });
+    f = Field.create('foo', {
+      type: {
+        subFoo: { type: 'String' }
+      }
+    });
     f.type.subFoo.type.should.be.instanceof(Scalar);
     f.serialize({ subFoo: 'asdf' }).subfoo.should.equal('asdf');
   });

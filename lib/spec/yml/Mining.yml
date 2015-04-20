@@ -1,0 +1,145 @@
+---
+
+group: Mining
+text: |
+  Methods related to BIPs 22 and 23, "smart" Bitcoin miners and proxies
+    https://github.com/bitcoin/bips/blob/master/bip-0022.mediawiki
+    https://github.com/bitcoin/bips/blob/master/bip-0023.mediawiki
+  Instead of sending a simple block header for hashing, the entire block structure
+  is sent, and left to the miner to (optionally) customize and assemble.
+
+methods:
+
+  GetBlockTemplate:
+    text: |
+      If the request parameters include a 'mode' key, that is used to explicitly
+      select between the default 'template' request or a 'proposal'.
+      It returns data needed to construct a block to work on.
+    params:
+      - name: request
+        default: null
+        example: { mode: template, capabilities: [longpoll, coinbasetxn, coinbasevalue] }
+        type:
+          mode:
+            text: this must be set to template or omitted
+            type: String
+            default: template
+          capabilities:
+            text: |
+              Client side supported feature list. Choose from
+              longpoll, coinbasetxn, coinbasevalue, proposal, serverlist, workid
+            type: [ String ]
+    result:
+      version: { text: The block version (1 or 2) }
+      bestBlockHash: { alias: previousblockhash, text: The hash of current highest block }
+      transactions:
+        text: |
+          Array of non-coinbase transactions
+          that should be included in the next block
+        type:
+          - data: { text: Transaction data }
+            hash: { type: LittleEndianHex, alias: id }
+            depends:
+              text: |
+                Transactions before this one (by 1-based index in 'transactions' list)
+                that must be present in the final block if this one is
+              type: [ Integer ]
+            feeSAT:
+              text: |
+                Difference in value between transaction inputs and outputs in Satoshis.
+                For coinbase transactions, this is a negative number of the total collected
+                block fees not including the block subsidy. If key is not present, fee
+                is unknown and clients must not assume there isn't one
+            nSignatureOperations:
+              default: null
+              text: |
+                Total number of signature operations, as counted for purposes of block limits.
+                If null, count is unknown and clients must not assume there aren't any.
+                Every CHECKSIG-like script op increases the number of signature operations (sigops) by a certain amount. So:
+                  A standard transaction has one or two sigops
+                  A sendmany transaction has one for each recipient (+1)
+                  A transaction using multisig counts as 20 per "multisig arrangement"
+                    unless you're using P2SH, in which case each public key involved
+                    in the multisig counts as one sigop.
+            isRequired:
+              text: if true, this transaction must be in the final block
+              defaut: false
+      coinbaseAux:
+        text: data that should be included in the coinbase's scriptSig content
+        type: { flags: { type: String } }
+      coinbaseValueSAT:
+        text: |
+          Maximum allowable input to coinbase transaction
+          including the generation award and transaction fees (in Satoshis)
+      coinbaseTxInfo: { type: Object, text: Information for coinbase transaction }
+      target: { text: The hash target }
+      minimumTime:
+        alias: mintime
+        text: |
+          The minimum timestamp appropriate for next block time
+           in seconds since epoch (Jan 1 1970 GMT)
+      mutable:
+        type: [ String ]
+        text: List of ways the block template may be changed
+        default: [ time, transactions, prevblock ]
+      nonceRange: { text: A range of valid nonces }
+      signatureOperationsLimit:
+        alias: sigoplimit
+        text: limit of sigops in blocks
+        type: Integer
+      nBytesSizeLimit: { text: limit of block size }
+      currentTime: { alias: curtime }
+      bits: { type: String }
+      height: { text: The height of the next block }
+
+  GetMiningInfo:
+    text: Mining-related information
+    result:
+      nBlocks: { text: Height of the latest block }
+      nBytesCurrentBlock:
+      nTransactionsCurrentBlock:
+      difficulty:
+      errors:
+      doGenerate: { text: whether generation is on (true) or off (false) }
+      nProcessors:
+        alias: genproclimit
+        text: limit of how many processors are being used for generation (-1 for no limit)
+      hashesPerSecond: { alias: hashespersec, type: Hertz }
+
+  GetNetworkHashPS:
+    text: Returns the estimated network hashes per second based on the last n blocks.
+    params:
+      - name: nBlocks
+        text: Number of recent blocks to average over. -1 for since last difficulty change.
+        default: 120
+      - name: height
+        text: Block height at which you want to estimate the network speed
+        default: -1
+    result: Hertz
+
+  PrioritiseTransaction:
+    text: Accepts the transaction into mined blocks at a higher (or lower) priority
+    params:
+      - name: id
+        text: ID of the transaction you want to prioritize
+        example: 5861981a75c19a870c22057dced6017666a6eccdf1ddebd9a0f9c52ebe7ebf4f
+      - name: deltaPriority
+        text: |
+          The priority to add or subtract. The transaction selection algorithm
+          considers the tx as it would have a higher priority
+          (priority of a transaction is calculated: coinage * value_in_satoshis / txsize)
+        example: 59047619
+      - name: deltaFeeSAT
+        text: |
+          The fee value in Satoshis to add (subtract if negative).
+          The fee is not actually paid, only used in the selection algorithm.
+        example: 10000
+    result: Boolean
+
+  SubmitBlock:
+    text: Attempts to submit new block to network.
+    params:
+      - name: block
+        type: Block
+        example: 0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4adae5494dffff001d1aa4ae180101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4d04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73ffffffff0100f2052a01000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000
+    result: None
