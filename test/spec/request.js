@@ -11,7 +11,7 @@ describe('Request', function() {
   var requestMock;
   beforeEach(function() {
     requestMock = Request.create({
-      method: Method.create({name: 'Foo'}, {name: 'GroupX'}),
+      method: Method.create('GetFoo'),
       args: []
     });
   });
@@ -40,7 +40,7 @@ describe('Request', function() {
   });
 
   it('lowercases the method name', function() {
-    requestMock.serialize().method.should.equal('foo');
+    requestMock.serialize().method.should.equal('getfoo');
   });
 
 });

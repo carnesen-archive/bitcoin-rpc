@@ -26,25 +26,8 @@ describe('Params', function() {
     should.exist(paramsMock);
   });
 
-  it('serialize should throw expected number of arguments', function() {
-    paramsMock.serialize.bind(paramsMock).should.throw('Expected 1 arguments');
-  });
-
-  it('serialize should package arguments into an array', function() {
-    paramsMock.serialize('a string')[0].should.equal('a string');
-  });
-
-  it('serializes an array', function() {
-    paramsMock.serialize(['0'])[0].should.equal('0');
-  });
-
-  it('serializes an object', function() {
-    paramsMock.serialize({foo: 'beef'})[0].should.equal('beef');
-  });
-
-  it('throws an error if param name is unknown', function() {
-    var fn = function() { paramsMock.serialize({fo: 'beef'})};
-    fn.should.throw('Unknown parameter');
+  it('serializes', function() {
+    paramsMock.serialize('beef', 'pie')[0].should.equal('beef');
   });
 
 });
