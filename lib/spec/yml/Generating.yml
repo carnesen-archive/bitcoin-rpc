@@ -1,0 +1,28 @@
+---
+
+group: Generating
+
+text: Methods for generating blocks in regression test (regtest) mode
+
+methods:
+  GetGenerate:
+    text: Whether (true) or not (false) Bitcoin Core is currently mining
+    result: Boolean
+
+  GetHashesPerSec:
+    text: Recent hashes per second performance measurement (0 if off)
+    result: Hertz
+
+  SetGenerate:
+    text: |
+      Turn generation on or off. In regtest mode,
+      returns a list of generated block hashes.
+    params:
+      - name: doGenerate
+        type: Boolean
+        example: false
+      - name: nProcessors
+        text: Limit number of processors (-1 for unlimited)
+        default: null
+    result: [ Hash ]
+    nullable: true
