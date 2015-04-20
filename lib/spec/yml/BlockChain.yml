@@ -1,92 +1,192 @@
 ---
 
-group:
+group: BlockChain
 
-  name: BlockChain
-
-  public: yes
-
-  description: |
-
-    Block chain operations and infomation
+text: Block chain operations and infomation
 
 methods:
 
-  - name: GetBestBlockHash
-    description: Hash of the best (tip) block in the longest block chain
+  GetBestBlockHash:
+    text: Hash of the best (tip) block in the longest block chain
     result: Hash
 
-  - name: GetBlock
+  _GetBlock:
     params:
-      - name: id
-        type: Hash
-        description: Hash of the block
+      - name: hash
+        text: Hash of the block
+        alias: id
+        example: 000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943
       - name: verbose
-        type: Boolean
-        description: yes for block information, no for actual block
-    result: Block
+        text: true for block information, false for actual block
+        default: true
+    result: Object
 
-  - name: GetBlockChainInfo
-    description: Get information about block chain processing
-    result: ChainInfo
+#  GetBlock:
+#    text: Get the actual block
+#    call: _GetBlock
+#    verbose: false
+#    result: Block
+#
+#  GetBlockInfo:
+#    text: Get details about the block
+#    call: _GetBlock
+#    verbose: true
+#    result:
+#      hash: { text: the block hash (same as provided) }
+#      nConfirmations:
+#        text: The number of confirmations or -1 if the block is not on the main chain
+#      nBytes: { alias: size }
+#      height:
+#      version:
+#      merkleRoot: { type: Hash }
+#      txIds: { type: [ Hash ] }
+#      time: { text: The block time in seconds since epoch (Jan 1 1970 GMT) (Unix time) }
+#      nonce:
+#      bits:
+#      difficulty:
+#      chainWork:
+#      previousBlockHash: { default: null }
+#      nextBlockHash: { default: null }
+#
+#  GetBlockChainInfo:
+#    text: Get information about block chain processing
+#    result:
+#      networkName:
+#        text: current network name as defined in BIP70 (main, test, regtest)
+#        alias: chain
+#      nBlocksProcessed:
+#        text: the current number of blocks processed in the server
+#        alias: blocks
+#      nHeadersValidated:
+#        text: the current number of headers we have validated
+#        alias: headers
+#      bestBlockHash:
+#        text: the hash of the currently best block
+#      currentDifficulty:
+#        alias: difficulty
+#      verificationProgress:
+#        text: estimate of verification progress [0..1]
+#        type: Float
+#      chainWork:
+#        text: total amount of work in active chain
+#
+  GetBlockCount:
+    text: Get the number of blocks in the longest block chain
+    result: Integer
 
-  - name: GetBlockCount
-    description: Get the number of blocks in the longest block chain
-    result: Int
-
-  - name: GetBlockHash
-    description: Get hash of block in best-block-chain at index provided
+  GetBlockHash:
+    text: Get hash of block in best-block-chain at index provided
     params:
-      - name: index
-        type: Int
-        description: Block index (height)
+      - name: height
+        text: Block index (height)
+        example: 0
     result: Hash
 
-  - name: GetChainTips
-    description: Get information about all known tips in the block tree
-    result: ChainTips
+  GetChainTips:
+    text: Get information about all known tips in the block tree
+    result:
+      - height: { text: number of blocks in the chain }
+        bestBlockHash: { text: hash of the best block in the chain, alias: hash }
+        branchLength:
+          text: number of blocks between this chain's tip and the main chain
+          alias: branchlen
+        status:
+          text: |
+            Possible values for status:
+            1.  "invalid"       This branch contains at least one invalid block
+            2.  "headers-only"  Not all blocks for this branch are available, but the headers are valid
+            3.  "valid-headers" All blocks are available for this branch, but they were never fully validated
+            4.  "valid-fork"    This branch is not part of the active chain, but is fully validated
+            5.  "active"        This is the tip of the active main chain, which is certainly valid
 
-  - name: GetDifficulty
-    description: Proof-of-work difficulty as a multiple of the minimum
-    result: Float
+  GetDifficulty:
+    text: Proof-of-work difficulty as a multiple of the minimum
+    result: Difficulty
 
-  - name: GetMemPoolInfo
-    description: Details on the active state of the TX memory pool.
-    result: MemPoolInfo
+  GetMemPoolInfo:
+    text: Details on the active state of the transaction memory pool
+    result:
+      nTransactions:
+        text: Current tx count
+        alias: size
+      nBytes:
+        text: Sum of all tx sizes
 
-  - name: GetRawMemPool
-    description: List of transactions in the memory pool
+  _GetRawMemPool:
+    text: List of transactions in the memory pool
     params:
       - name: verbose
-        type: Boolean
-        description: true for details about each transaction, false for hash only
-    result: RawMemPool
+        text: true for details about each transaction, false for hash only
+        default: false
+    result: Object
 
-  - name: GetTxOut
-    description: Get details about an unspent transaction result
+#  GetMemPoolTxIds:
+#    call: _GetRawMemPool
+#    verbose: false
+#    result: [ Hash ]
+#
+#  GetMemPoolTxDetails:
+#    call: _GetRawMemPool
+#    verbose: true
+#    result:
+#      - nBytes: { alias: size }
+#        feeBTC:
+#        arrivalTime: { alias: time }
+#        arrivalHeight: { alias: height }
+#        arrivalPriority: { alias: startingpriority }
+#        currentPriority:
+#        unconfirmedPrevTxIds:
+#          text: unconfirmed transactions used as inputs for this transaction
+#          alias: depends
+#          type: [ Hash ]
+#
+  GetTxOut:
+    text: Get details about an unspent transaction output (UTXO)
     params:
       - name: txId
         type: Hash
-        description: Hash of the transaction
-      - name: vOut
-        type: Int
-      - name: includeMemPool
-        type: Boolean
-        description: whether or not to include mempool transactions
-    result: UtxoInfo
+        alias: hash
+        example: 604a76eac59a808e4df2e6ef3821add5355fc6f2dbe6f26cd853a98c9c32b7ff
+      - name: outputIndex
+        alias: vout
+        example: 0
+      - name: doIncludeMemPool
+        text: Whether (true) or not (false) to include mempool transactions
+        example: false
+    result:
+      bestBlockHash: { alias: bestblock }
+      nConfirmations:
+      valueBTC:
+      scriptPubKey:
+        alias: scriptPubKey
+        type:
+          opCodes: { alias: asm }
+          hex:
+          nRequiredSignatures: { alias: reqSigs }
+          txType: { alias: type }
+          addresses: { type: [ String ] }
+      version:
+      isCoinbase:
 
-  - name: GetTxOutSetInfo
-    description: Get details about the unspent transaction result set
-    result: UtxoSetInfo
+  GetTxOutSetInfo:
+    text: Get details about the unspent transaction result set
+    result:
+      - bestBlockHeight: { alias: height }
+        bestBlockHash: { alias: bestblock }
+        nTransactions: { alias: transactions }
+        nTxOuts:
+        nBytes: { alias: bytes_serialized }
+        hash: { alias: hash_serialized }
+        totalBTC: { alias: total_amount}
 
-  - name: VerifyChain
-    description: Verifies the block chain database
-    public: no
+  VerifyChain:
+    text: Verifies the block chain database
     params:
       - name: checkLevel
-        type: Int
-        description: How thorough the block veification is (0-4)
+        type: Integer
+        text: How thorough the block verification is (0-4)
+        example: 0
       - name: nBlocks
-        type: Int
-        description: The number of blocks to check
+        text: The number of blocks to check
+        example: 0
     result: Boolean
