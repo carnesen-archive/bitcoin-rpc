@@ -13,10 +13,10 @@ var methods = require('../lib/spec/methods');
 
 var client = BitcoinJsonRpc.Client.create(config.get('client'));
 
-var methodsThatTakeTooLong = ['VerifyChain', 'GetTxOutSetInfo'];
+var methodsThatTakeTooLong = ['VerifyChain'];
 
 describe('Client integration tests', function() {
-  this.timeout(3000);
+  this.timeout(8000);
 
   methods.forEach(function(method) {
     var args = method.params.fields.map(function(field) {
