@@ -1,0 +1,143 @@
+---
+
+group: RawTransactions
+
+methods:
+
+  CreateRawTransaction:
+    text: |
+      Create a transaction spending the given inputs and sending to the given addresses.
+      Returns hex-encoded raw transaction. Note that the transaction's inputs are not signed,
+      and it is not stored in the wallet or transmitted to the network.
+    params:
+      - name: inputs
+        type:
+          - txId:
+            outputIndex:
+        example:
+          - txId: 5861981a75c19a870c22057dced6017666a6eccdf1ddebd9a0f9c52ebe7ebf4f
+            outputIndex: 1
+      - name: outputs
+        type: Object
+        text: Object of address:valueBTC pairs
+        example:
+          n2pp3K5ygHdiVrMcaMuFw6i1PheacRJv7d: 1.1
+    result: Transaction
+
+  DecodeRawTransaction:
+    text: Parses the serialized transaction provided and returns an object
+    params:
+      - name: transaction
+        type: Buffer
+        example: 0100000001ca408f2678979ac5ee9dc11efdfe7529dedb5a8e18ab9ef302e059dc316b8949010000006a47304402205a31f60debc5e0e7fce7d910d6e3e94c1f5e134b96b07325259521e09b7119b4022019148311091760ce1dcae4287258af720e57be7e5cb843e9ceb9fcaff2ec9efd012102662111ebeac6d8e34c91d455c39e2c14ad008d69747e2a5433cbd00301b10f54ffff00ff022ade0b00000000001976a914a11b66a67b3ff69671c8f82254099faf374b800e88ac1625c900000000001976a91455d3ca5893ffbda81c8a4bec864fb1225c1b655788ac00000001
+    result:
+      txId:
+      version:
+      lockTime:
+      inputs:
+        alias: vin
+        text: Array of the inputs to the transaction
+        type:
+          - prevTxId: { alias: txid }
+            outputIndex: { alias: vout }
+            scriptSig:
+              type:
+                opCodes: { alias: asm }
+                hex:
+            sequence:
+      outputs:
+        alias: vout
+        type:
+          valueBTC:
+          outputIndex: { alias: n }
+          scriptPubKey:
+            type:
+              asm:
+              hex:
+              nRequiredSignatures: { alias: reqSigs }
+              transactionType: { alias: type, type: String }
+              addresses:
+                type: [ BitcoinAddress ]
+
+  DecodeScript:
+    text: Decode a hex-encoded script.
+    params:
+      - name: script
+        example: 76a91455d3ca5893ffbda81c8a4bec864fb1225c1b655788ac
+    result:
+      asm:
+      hex:
+      outputType: { alias: type }
+      nRequiredSigs: { alias: reqSigs }
+      addresses:
+        type: [ String ]
+      p2sh: { default: null, type: String }
+
+  _GetRawTransaction:
+    text: |
+      Return the raw transaction data.
+
+      Note: By design Bitcoin Core does not maintain a full transaction index.
+      Use the -txindex command line option to tell it to build a full index, which can take
+      many hours. By default, this method only returns a result if ID provided is for a
+      transaction in the mempool or if the transaction contains an unspent output.
+
+      If verbose=0, returns a buffer that is serialized, hex-encoded data for 'txId'.
+      If verbose is non-zero, returns an Object with information about 'txId'.
+    params:
+      - name: txId
+        type: Buffer
+        example: 75c0765c97805ff6bc7e383d5b927620cf39afa87f061784e94aa092c10c9b57
+      - name: verbose
+        type: Integer
+        default: 0
+    result: Object
+
+
+  SendRawTransaction:
+    text: |
+      Submits a serialized transaction to local node and network.
+      Also see CreateRawTransaction and SignRawTransaction calls.
+    params:
+      - name: tx
+        type: Buffer
+        example: 0100000001ca408f2678979ac5ee9dc11efdfe7529dedb5a8e18ab9ef302e059dc316b8949010000006a47304402205a31f60debc5e0e7fce7d910d6e3e94c1f5e134b96b07325259521e09b7119b4022019148311091760ce1dcae4287258af720e57be7e5cb843e9ceb9fcaff2ec9efd012102662111ebeac6d8e34c91d455c39e2c14ad008d69747e2a5433cbd00301b10f54ffff00ff022ade0b00000000001976a914a11b66a67b3ff69671c8f82254099faf374b800e88ac1625c900000000001976a91455d3ca5893ffbda81c8a4bec864fb1225c1b655788ac00000001
+      - name: allowHighFees
+        type: Boolean
+        default: false
+    result: Hash
+
+  SignRawTransaction:
+    text: |
+      Sign inputs for raw transaction (serialized, hex-encoded).
+      The second optional argument (may be null) is an array of previous transaction outputs that
+      this transaction depends on but may not yet be in the block chain.
+      The third optional argument (may be null) is an array of base58-encoded private
+      keys that, if given, will be the only keys used to sign the transaction.
+    params:
+      - name: transaction
+        example: 0100000001ca408f2678979ac5ee9dc11efdfe7529dedb5a8e18ab9ef302e059dc316b8949010000006a47304402205a31f60debc5e0e7fce7d910d6e3e94c1f5e134b96b07325259521e09b7119b4022019148311091760ce1dcae4287258af720e57be7e5cb843e9ceb9fcaff2ec9efd012102662111ebeac6d8e34c91d455c39e2c14ad008d69747e2a5433cbd00301b10f54ffff00ff022ade0b00000000001976a914a11b66a67b3ff69671c8f82254099faf374b800e88ac1625c900000000001976a91455d3ca5893ffbda81c8a4bec864fb1225c1b655788ac00000001
+      - name: prevTxs
+        text: An json array of previous dependent transaction outputs
+        type:
+          - txId:
+            outputIndex: { alias: vout }
+            scriptPubKey: { alias: scriptPubKey }
+            redeemScript: { alias: redeemScript, type: Hex }
+        default: null
+      - name: privateKeys
+        text: Array base58-encoded private keys for signing
+        type: [ String ]
+        default: null
+      - name: sigHashType
+        text: |
+          The signature hash type. Must be one of
+             ALL
+             NONE
+             SINGLE
+             ALL|ANYONECANPAY
+             NONE|ANYONECANPAY
+             SINGLE|ANYONECANPAY
+          Default is ALL
+        type: String
+        default: null

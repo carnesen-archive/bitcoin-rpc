@@ -48,4 +48,13 @@ describe('Field', function() {
     f.serialize({ subFoo: 'asdf' }).subfoo.should.equal('asdf');
   });
 
+  it('can navigate combined Array and Object types', function() {
+    f = Field.create('foo', {
+      type: [{
+        subFoo: { type: 'String' }
+      }]
+    });
+    f.serialize([{ subFoo: 'asdf' }])[0].subfoo.should.equal('asdf');
+  });
+
 });
