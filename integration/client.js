@@ -13,8 +13,6 @@ var methods = require('../lib/spec/methods');
 
 var client = BitcoinJsonRpc.Client.create(config.get('client'));
 
-var methodsThatTakeTooLong = ['VerifyChain'];
-
 describe('Client integration tests', function() {
   this.timeout(8000);
 
@@ -23,8 +21,7 @@ describe('Client integration tests', function() {
       return (field.example === undefined) ? field.default : field.example;
     });
     var request = requests[method.name].apply(this, args);
-    //method.group === 'RawTransactions' &&
-    if(methodsThatTakeTooLong.indexOf(method.name) === -1) {
+    if(method.group !== 'Wallet' && method.name !== 'VerifyChain') {
       it(method.name, function(done) {
         client.sendRequest(request, function(err, ret) {
           if(err) {

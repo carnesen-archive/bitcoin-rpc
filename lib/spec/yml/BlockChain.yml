@@ -48,28 +48,28 @@ methods:
 #      previousBlockHash: { default: null }
 #      nextBlockHash: { default: null }
 #
-#  GetBlockChainInfo:
-#    text: Get information about block chain processing
-#    result:
-#      networkName:
-#        text: current network name as defined in BIP70 (main, test, regtest)
-#        alias: chain
-#      nBlocksProcessed:
-#        text: the current number of blocks processed in the server
-#        alias: blocks
-#      nHeadersValidated:
-#        text: the current number of headers we have validated
-#        alias: headers
-#      bestBlockHash:
-#        text: the hash of the currently best block
-#      currentDifficulty:
-#        alias: difficulty
-#      verificationProgress:
-#        text: estimate of verification progress [0..1]
-#        type: Float
-#      chainWork:
-#        text: total amount of work in active chain
-#
+  GetBlockChainInfo:
+    text: Get information about block chain processing
+    result:
+      networkName:
+        text: current network name as defined in BIP70 (main, test, regtest)
+        alias: chain
+      nBlocksProcessed:
+        text: the current number of blocks processed in the server
+        alias: blocks
+      nHeadersValidated:
+        text: the current number of headers we have validated
+        alias: headers
+      bestBlockHash:
+        text: the hash of the currently best block
+      currentDifficulty:
+        alias: difficulty
+      verificationProgress:
+        text: estimate of verification progress [0..1]
+        type: Float
+      chainWork:
+        text: total amount of work in active chain
+
   GetBlockCount:
     text: Get the number of blocks in the longest block chain
     result: Integer
