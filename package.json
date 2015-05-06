@@ -1,23 +1,24 @@
 {
-  "name": "bitcoin-rpc-client",
+  "name": "bitcoin-rpc",
   "description": "An RPC Client for Bitcoin Core",
   "version": "0.1.0",
+  "main": "lib/index.js",
   "author": {
     "name": "Chris Arnesen",
     "email": "chris.arnesen@gmail.com"
   },
-  "repository": "git://github.com/carnesen/bitcoin-rpc-client.git",
+  "repository": "git://github.com/carnesen/bitcoin-rpc.git",
   "bugs": {
-    "url": "https://github.com/carnesen/bitcoin-rpc-client/issues"
+    "url": "https://github.com/carnesen/bitcoin-rpc/issues"
   },
-  "homepage": "https://github.com/carnesen/bitcoin-rpc-client",
+  "homepage": "https://github.com/carnesen/bitcoin-rpc",
   "license": "MIT",
   "scripts": {
     "test": "gulp test"
   },
   "dependencies": {
     "async": "0.9.0",
-    "bitcoin-rpc-spec": "git://github.com/carnesen/bitcoin-rpc-spec.git",
+    "bitcoin-rpc-spec": "^0.1.0",
     "bitcore": "^0.11.4",
     "config": "^1.12.0",
     "js-yaml": "^3.2.7",
