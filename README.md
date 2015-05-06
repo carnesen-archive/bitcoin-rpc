@@ -1,13 +1,14 @@
-bitcoin-json-rpc
+bitcoin-rpc
 ================
 
-[![Build Status](https://travis-ci.org/carnesen/bitcoin-json-rpc.svg)](https://travis-ci.org/carnesen/bitcoin-json-rpc)
-[![Coverage Status](https://coveralls.io/repos/carnesen/bitcoin-json-rpc/badge.svg)](https://coveralls.io/r/carnesen/bitcoin-json-rpc)
+[![Build Status](https://travis-ci.org/carnesen/bitcoin-rpc.svg)](https://travis-ci.org/carnesen/bitcoin-rpc)
+[![Coverage Status](https://coveralls.io/repos/carnesen/bitcoin-rpc/badge.svg)](https://coveralls.io/r/carnesen/bitcoin-rpc)
 
-Features:
-* 
+Install
+-------
 
-To do:
-* apply naming conventions on result (optional)
-* apply type interpretations on result (optional)
-* batch event emitter mode for blocks and transactions
+npm install bitcoin-rpc
+
+Examples
+--------
+

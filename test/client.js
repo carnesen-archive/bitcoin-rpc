@@ -4,8 +4,10 @@ var chai = require('chai');
 var should = chai.should();
 var sinon = require('sinon');
 
-var Request = require('../../lib/spec/request');
-var Client = require('../../lib/client');
+var spec = require('bitcoin-rpc-spec');
+var Request = spec.Request;
+
+var Client = require('../lib/client');
 
 describe('Client', function() {
 

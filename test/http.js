@@ -1,13 +1,12 @@
 'use strict';
 
 var http = require('http');
-var https = require('https');
 var EventEmitter = require('events').EventEmitter;
 var sinon = require('sinon');
 var chai = require('chai');
 var should = chai.should();
 
-var HttpClient = require('../../lib/client/http');
+var HttpClient = require('../lib/http');
 
 describe('HttpClient', function() {
 

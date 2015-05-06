@@ -5,13 +5,13 @@ var config = require('config');
 var chai = require('chai');
 chai.should();
 
-var BitcoinJsonRpc = require('../lib');
-var Client = BitcoinJsonRpc.Client;
-var requests = BitcoinJsonRpc.requests;
+var spec = require('bitcoin-rpc-spec');
+var methods = spec.methods;
 
-var methods = require('../lib/spec/methods');
+var rpc = require('../lib');
+var requests = rpc.requests;
 
-var client = BitcoinJsonRpc.Client.create(config.get('client'));
+var client = rpc.Client.create(config.get('client'));
 
 describe('Client integration tests', function() {
   this.timeout(8000);

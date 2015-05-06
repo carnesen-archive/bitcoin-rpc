@@ -2,8 +2,9 @@
 
 var should = require('chai').should();
 
+var spec = require('bitcoin-rpc-spec');
+var methods = spec.methods;
 var Requests = require('../lib/requests');
-var methods = require('../lib/spec/methods');
 
 describe('Requests', function() {
 
