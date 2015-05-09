@@ -9,3 +9,12 @@ bitcoin-rpc
 Examples
 --------
 
+```node
+var rpc = require('bitcoin-rpc');
+var Client = rpc.Client;
+var requests = rpc.requests;
+
+client.sendRequest(requests.GetInfo(), console.log);
+client.sendRequest(requests.GetInfo(), console.log);
+client.sendRequest(requests.ValidateAddress(19zc6mD19EiKgCbkbsd9h4jZuaYnezxBn6), console.log);
+```
