@@ -13,10 +13,10 @@ Examples
 var config = require('config');
 var rpc = require('bitcoin-rpc');
 
-var client = rpc.Client.create(config.get('client'));
+var opts = config.get('client');
+var client = rpc.Client.create(opts);
 var requests = rpc.requests;
 
-client.sendRequest(requests.GetInfo(), console.log);
 client.sendRequest(requests.GetInfo(), console.log);
 client.sendRequest(requests.ValidateAddress('19zc6mD19EiKgCbkbsd9h4jZuaYnezxBn6'), console.log);
 ```
