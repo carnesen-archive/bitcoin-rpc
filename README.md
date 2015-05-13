@@ -20,5 +20,3 @@ var requests = rpc.requests;
 client.sendRequest(requests.GetInfo(), console.log);
 client.sendRequest(requests.ValidateAddress('19zc6mD19EiKgCbkbsd9h4jZuaYnezxBn6'), console.log);
 ```
-
-See [bitcoin-rpc-spec](https://github.com/carnesen/bitcoin-rpc-spec/lib/yml) for a complete list of the available methods.
