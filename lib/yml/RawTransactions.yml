@@ -73,7 +73,7 @@ methods:
         type: [ String ]
       p2sh: { default: null, type: String }
 
-  _GetRawTransaction:
+  GetRawTransaction:
     text: |
       Return the raw transaction data.
 

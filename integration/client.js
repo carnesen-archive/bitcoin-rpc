@@ -5,8 +5,7 @@ var config = require('config');
 var chai = require('chai');
 chai.should();
 
-var spec = require('bitcoin-rpc-spec');
-var methods = spec.methods;
+var methods = require('../lib/methods');
 
 var rpc = require('../lib');
 var requests = rpc.requests;

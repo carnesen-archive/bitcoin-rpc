@@ -3,8 +3,6 @@
 
 var config = require('config');
 
-var spec = require('bitcoin-rpc-spec');
-
 var rpc = require('../lib');
 var requests = rpc.requests;
 var client = rpc.Client.create(config.get('client'));
