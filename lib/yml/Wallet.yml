@@ -1,0 +1,573 @@
+---
+
+group: Wallet
+
+text: |
+  Methods related to wallet operations
+  Example private key cNttY6Aty9myMAfNacxrvbW4KQNff6mt279LkNWDQUPWdYsycwW8
+  With address mkRLiFtiEzuqaC7hDUNMwTniMTUhq9xpK7
+
+methods:
+  AddMultiSigAddress:
+    text: |
+      Add a multisignature address to the wallet.
+      Returns a bitcoin address associated with the keys provided.
+    params:
+      - name: nRequired
+        text: The number of required signatures out of the n keys or addresses
+        example: 2
+      - name: keys
+        text: Array of bitcoin addresses / hex-encoded public keys
+        example:
+          - 16sSauSf5pF2UkUwvKGq4qjNRzBZYqgEL5
+          - 171sgjn4YtPu27adkKGrdDwzRTxnRkBfKV
+      - name: account
+        text: Account to assign the address (null means default account)
+        default: null
+    result: BitcoinAddress
+
+  BackupWallet:
+    params:
+      - name: destination
+        type: Path
+        text: Can be a directory or a path with filename
+        example: /dev/null
+    result: None
+    text: Safely copies wallet.dat to destination
+
+  DumpPrivKey:
+    text: |
+      Reveals the private key corresponding to BitcoinAddress
+      See also ImportPrivKey, which can be used with this output
+    params:
+      - name: bitcoinAddress
+        example: 1234
+    result: PrivateKey
+
+  DumpWallet:
+    text: Dumps all wallet keys in a human-readable format.
+    params:
+      - name: filename
+        example: /dev/null
+    result: None
+
+  EncryptWallet:
+    text: |
+      Encrypts the wallet with 'passphrase'. This is for first time encryption.
+      After this, any calls that interact with private keys such as sending or signing
+      will require the passphrase to be set prior the making these calls.
+      Use the WalletPassphrase call for this, and then WalletLock call.
+      If the wallet is already encrypted, use the WalletPassphraseChange call.
+      Note that this will shutdown the server.
+    params:
+      - name: passphrase
+        text: |
+          The pass phrase to encrypt the wallet with.
+          It must be at least 1 character, but should be long.
+        example: foo123
+    result: None
+
+  GetAccount:
+    text: Returns the account associated with the given address.
+    params:
+      - name: BitcoinAddress
+        text: The bitcoin address for account lookup
+        example: 1D1ZrZNe3JUo7ZycKEYQQiQAWd9y54F4XZ
+    result: Account
+
+  GetAccountAddress:
+    text: Returns the current Bitcoin address for receiving payments to this account.
+    params:
+      - name: account
+        text: |
+          The account name for the address. It can also be set to the empty string
+          to represent the default account. The account does not need to exist.
+          It and a new address will be created if there's no account with the given name.
+        default: ""
+    result: BitcoinAddress
+
+  GetAddressesByAccount:
+    params:
+      - name: account
+        example: test
+        default: ""
+    text: Returns the list of addresses for the given account.
+    result: [ BitcoinAddress ]
+
+  GetBalance:
+    params:
+      - name: account
+        text: Use * for the entire wallet. It may be the default account using ""
+        default: ""
+      - name: minconf
+        default: 1
+        text: Only include transactions confirmed at least this many times.
+      - name: doIncludeWatchOnly
+        text: If true, include balance in WatchOnly addresses (see ImportAddress)
+        default: false
+    text: |
+      If account is not specified, returns the server's total available balance.
+      If account is specified, returns the balance in the account.
+      Note that the account  is not the same as leaving the parameter out.
+      The server total may be different to the balance in the default  account.
+    result: BTC
+
+  GetNewAddress:
+    text: |
+      Returns a new Bitcoin address for receiving payments.
+      If account is specified (recommended), it is added to the address book,
+      so payments received with the address will be credited to that account.
+    params:
+      - name: account
+        default: null
+        text: |
+          The account name for the address to be linked to. If not provided,
+          the default account is used. It can also be set to the empty string to
+          represent the default account. The account does not need to exist. It
+          will be created if there is no account by the given name.
+    result: BitcoinAddress
+
+  GetRawChangeAddress:
+    text: |
+      Returns a new Bitcoin address, for receiving change.
+      This is for use with raw transactions, NOT normal use.
+    result: BitcoinAddress
+
+  GetReceivedByAccount:
+    params:
+      - name: account
+        default: ""
+      - name: minconf
+        default: 1
+    text: Returns the total amount received to address in the account specified
+    result: BTC
+
+  GetReceivedByAddress:
+    params:
+      - name: BitcoinAddress
+        example: mkRLiFtiEzuqaC7hDUNMwTniMTUhq9xpK7
+      - name: nConfirmations
+        text: Minimum number of confirmations required
+        default: 1
+    text: Returns the total amount received by the given BitcoinAddress
+    result: BTC
+
+  GetTransaction:
+    text: Get detailed information about in-wallet transaction
+    params:
+      - name: txId
+        example: 7d8989613ee46f4961867a329b772159e78ad4f454b1fb40c5293ed4cc074493
+      - name: doIncludeWatchOnly
+        default: false
+        text: Whether to include watchonly addresses in balance calculation and details
+    result:
+      amountBTC:
+      nConfirmations:
+      blockHash:
+      blockHeight:
+      blockTime:
+      txId:
+      time:
+      receivedTime: { alias: timereceived }
+      details:
+        type:
+          - account:
+            address:
+            category: { text: send or receive }
+            amountBTC:
+            outputIndex: { alias: vout }
+      hex:
+
+  GetUnconfirmedBalance:
+    text: Returns the server's total unconfirmed balance
+    result: BTC
+
+  GetWalletInfo:
+    text: Returns an object containing various wallet state info.
+    result:
+      walletVersion:
+      balanceBTC:
+      nTransaction: { alias: txcount, text: total number of transactions in the wallet }
+      oldestKeyTime:
+        text: the timestamp of the oldest pre-generated key in the key pool
+      nKeys: { text: Number of keys pre-generated in the key pool }
+      unlockedUntilTime:
+        alias: unlocked_until
+        text: |
+          Time until which the wallet is unlocked for transfers,
+          or 0 if the wallet is locked.
+
+  ImportAddress:
+    text: |
+      Adds an address or script (in hex) that can be watched
+      as if it were in your wallet but cannot be used to spend.
+      Note: This call can take minutes to complete if rescan is true.
+    params:
+      - name: address
+        text: Bitcoin address or script
+        example: mkRLiFtiEzuqaC7hDUNMwTniMTUhq9xpK7
+      - name: label
+        default: ""
+      - name: doRescan
+        default: true
+        example: false
+        text: Rescan the wallet for transactions corresponding to the address provided
+
+  ImportPrivKey:
+    text: |
+      Adds a private key (as returned by DumpPrivKey) to your wallet.
+      Note: This call can take minutes to complete if rescan is true.
+    params:
+      - name: privateKey
+        text: The private key (see DumpPrivKey)
+        example: cNttY6Aty9myMAfNacxrvbW4KQNff6mt279LkNWDQUPWdYsycwW8
+      - name: label
+        default: null
+        text: An optional label
+        example: test
+      - name: doRescan
+        default: null
+        text: Rescan the wallet for transactions (null is same as true)
+        example: false
+    result: None
+
+  ImportWallet:
+    text: Imports keys from a wallet dump file (see DumpWallet).
+    params:
+      - name: filename
+        text: The wallet file
+        example: test
+
+  KeyPoolRefill:
+    text: Fills the keypool
+    params:
+      - name: newsize
+        type: Integer
+        default: 100
+        text: The new keypool size
+    result: None
+
+  ListAccounts:
+    text: Returns Object that has account names as keys, account balances as values.
+    params:
+      - name: minconf
+        text: Only include transactions with at least this many confirmations
+        default: 1
+      - name: doIncludeWatchonly
+        text: Include balances in watchonly addresses (see ImportAddress)
+        default: false
+    result: Object
+
+  ListAddressGroupings:
+    text: |
+      Lists groups of addresses which have had their common ownership
+      made public by common use as inputs or as the resulting change
+      in past transactions
+        [
+          bitcoinaddress,     (string) The bitcoin address
+          amount,                 (numeric) The amount in btc
+          account             (string, optional) The account
+        ]
+    result: [ Object ]
+
+  ListLockUnspent:
+    text: |
+      Returns list of temporarily unspendable outputs.
+      See the lockunspent call to lock and unlock transactions for spending.
+    result:
+      - txId: { text: The transaction id locked }
+        outputIndex: { alias: vout, text: The vout value }
+
+  ListReceivedByAccount:
+    text: List balances by account
+    params:
+      - name: minconf
+        default: 1
+        text: The minimum number of confirmations before payments are included.
+      - name: doIncludeEmpty
+        default: false
+        text: Whether to include accounts that haven't received any payments.
+      - name: doIncludeWatchOnly
+        default: false
+        text: Whether to include WatchOnly addresses (see ImportAddress)
+    result:
+      - involvesWatchOnly:
+          text: only returned if imported addresses were involved in transaction
+          default: true
+        account:
+          text: The account name of the receiving account
+        amountBTC:
+          text: The total amount received by addresses with this account
+        nConfirmations:
+          text: The number of confirmations of the most recent transaction included
+
+  ListReceivedByAddress:
+    text: List balances by receiving address
+    params:
+      - name: minconf
+        text: The minimum number of confirmations before payments are included
+        default: 1
+      - name: doIncludeEmpty
+        default: false
+        text: Whether to include addresses that haven't received any payments
+      - name: doIncludeWatchOnly
+        text: Whether to include watchonly addresses (see ImportAddress)
+        default: false
+    result:
+      - involvesWatchOnly:
+          text: only returned if imported addresses were involved in transaction
+          default: true
+        account:
+          text: The account name of the receiving account
+        amountBTC:
+          text: The total amount received by addresses with this account
+        nConfirmations:
+          text: The number of confirmations of the most recent transaction included
+
+  ListSinceBlock:
+    text: Get all transactions in blocks since block blockHash
+    params:
+      - name: blockHash
+        text: The block hash to list transactions since (null means since genesis)
+        default: null
+      - name: nConfirmations
+        text: Must be 1 or more
+        default: 1
+      - name: doIncludeWatchOnly
+        text: If true, include transactions to WatchOnly addresses
+        default: false
+    result:
+      transactions:
+        - account:
+          address:
+            text: |
+              The bitcoin address of the transaction.
+              Not present for move transactions (category = move).
+          category:
+            text: send (negative amounts) or receive (positive amounts)
+          amountBTC:
+            text: |
+              The amount in bitcoins. This is negative for the 'send' category,
+              and for the 'move' category for moves outbound. It is positive for
+              the 'receive' category, and for the 'move' category for inbound funds.
+          outputIndex:
+          feeBTC:
+            default: null
+            text: negative and only available for the 'send' category of transactions.
+          nConfirmations:
+            text: |
+              The number of confirmations for the transaction.
+              Available for 'send' and 'receive' category of transactions.
+          blockHash:
+          blockIndex:
+          blockTime:
+          txId:
+          time:
+          receivedTime:
+          comment:
+          to:
+      lastblock: lastblockhash     (string) The hash of the last block
+
+  ListTransactions:
+    text: |
+      Returns up to 'count' most recent transactions skipping
+      the first 'from' transactions for account 'account'.
+    params:
+      - name: account
+        text: The account name. If null, all accounts.
+        default: null
+      - name: count
+        text: The number of transactions to return
+        default: 10
+      - name: from
+        text: The number of transactions to skip
+        default: 0
+      - name: IncludeWatchOnly
+        text: Include transactions to watchonly addresses (see ImportAddress)
+        default: false
+    result: Object
+    todo:
+      account: accountname The account name associated with the transaction. It will be  for the default account.
+      address: bitcoinaddress The bitcoin address of the transaction. Not present for  move transactions (category = move).
+      category: send|receive|move, (string) The transaction category. 'move' is a local (off blockchain) transaction between accounts, and not associated with an address, transaction id or block. 'send' and 'receive' transactions are associated with an address, transaction id and block details
+      amount: The amount in btc. This is negative for the 'send' category, and for the 'move' category for moves outbound. It is positive for the 'receive' category, and for the 'move' category for inbound funds.
+      vout: the vout value
+      fee: The amount of the fee in btc. This is negative and only available for the  send' category of transactions.
+      confirmations: the number of confirmations for the transaction.
+      blockhash: block hash containing the transaction.
+      blockindex: The block index containing the transaction.
+      txid: transaction id.
+      time:
+      timereceived:
+      comment:
+      otheraccount: |
+        For the 'move' category of transactions, the account
+        the funds came from (for receiving funds, positive amounts),
+        or went to (for sending funds, negative amounts).
+
+  ListUnspent:
+    text: |
+      Returns array of unspent transaction outputs
+      with between minconf and maxconf (inclusive) confirmations.
+      Optionally filter to only include txouts paid to specified addresses.
+      Results are an array of Objects, each of which has:
+      {txid, vout, scriptPubKey, amount, confirmations}
+    params:
+      - name: minconf
+        default: 1
+      - name: maxconf
+        default: 9999999
+        text: The maximum confirmations to filter
+      - name: addresses
+        text: Array of bitcoin addresses to filter
+        default: []
+        type: [ BitcoinAddress ]
+    result:
+      - txId:
+        outputIndex:
+        BitcoinAddress:
+        account:
+        scriptPubKey:
+        amountBTC:
+        nConfirmations:
+
+  LockUnspent:
+    text: |
+
+      Updates list of temporarily unspendable outputs.
+
+      Returns whether the command was successful or not.
+
+      Temporarily lock (unlock=false) or unlock (unlock=true) specified outputs.
+      A locked transaction output will not be chosen by automatic coin selection.
+      Locks are stored in memory only. Nodes start with zero locked outputs, and
+      the locked output list is always cleared (by virtue of process exit) when a
+      node stops or fails. Also see the ListUnspent call
+
+    params:
+      - name: doUnlock
+        text: Whether to unlock (true) or lock (false) the specified transactions
+        example: true
+      - name: transactions
+        text: Array of objects
+        type:
+          - txId:
+            outputIndex:
+        example: []
+#          - txId: 7d8989613ee46f4961867a329b772159e78ad4f454b1fb40c5293ed4cc074493
+#            outputIndex: 0
+    result: Boolean
+
+  Move:
+    text: |
+      Move a specified amount from one account in your wallet to another.
+      Returns true if successful.
+    params:
+      - name: fromAccount
+        text: The name of the account to move funds from
+        example: ""
+      - name: toAccount
+        text: The name of the account to move funds to
+        example: test
+      - name: minconf
+        text: Only use funds with at least this many confirmations.
+        default: 1
+      - name: comment
+        text: An optional comment, stored in the wallet only.
+        default: ""
+    result: Boolean
+
+  SendFrom:
+    text: |
+      Sent an amount from an account to a bitcoin address.
+      The amount is a real and is rounded to the nearest 0.00000001.
+    params:
+      - name: fromAccount
+        text: The name of the account to send funds from. "" means default account
+        example: ""
+      - name: toBitcoinAddress
+        text: The bitcoin address to send funds to.
+        example: mkRLiFtiEzuqaC7hDUNMwTniMTUhq9xpK7
+      - name: amountBTC
+        text: Transaction fee is added on top
+        example: 0.1
+      - name: minconf
+        default: 1
+        text: Only use funds with at least this many confirmations.
+      - name: comment
+        text: |
+          A comment used to store what the transaction is for.
+          This is not part of the transaction, just kept in your wallet.
+        default: ""
+      - name: commentTo
+        text: |
+          A comment to store the name of the recipient.
+          This is not part of the transaction, just kept in your wallet.
+        default: ""
+    result: TxId
+
+  SendMany:
+    text: |
+      Send multiple times. Amounts are double-precision floating point numbers.
+      Returns the transaction id for the send. Only 1 transaction is created
+      regardless of the number of addresses.
+    params:
+      - name: fromAccount
+        text: Empty string means the default account
+        example: ""
+      - name: amounts
+        type: Object
+        text: An object with address:amountBTC as the key:value pairs
+        example: { mjUq15ga1EwCXJUHs2QiYhhrxTansS3Rc7: 0.01 }
+      - name: minconf
+        default: 1
+        text: Only use the balance confirmed at least this many times.
+      - name: comment
+        default: ""
+    result: TxId
+
+  SendToAddress:
+    text: |
+      Send an amount to a given address. The amount is interpreted as a
+      floating point number (real) and is rounded to the nearest 0.00000001
+    params:
+      - name: BitcoinAddress
+        example: mkRLiFtiEzuqaC7hDUNMwTniMTUhq9xpK7
+      - name: amountBTC
+        example: 0.1
+      - name: comment
+        default: ""
+      - name: commentTo
+        default: ""
+    result: TxId
+
+  SetAccount:
+    text: Sets the account associated with the given address
+    params:
+      - name: bitcoinAddress
+        text: The bitcoin address to be associated with an account
+        example: mjUq15ga1EwCXJUHs2QiYhhrxTansS3Rc7
+      - name: account
+        text: The account to assign the address to
+        example: ""
+    result: Object
+
+  SetTxFee:
+    text: |
+      Set the transaction fee, BTC per kB, nearest 0.00000001
+      Returns true if successful
+    params:
+      - name: feeRate
+        example: 0.00001
+    result: Boolean
+
+  SignMessage:
+    text: Sign a message with the private key of an address
+    params:
+      - name: BitcoinAddress
+        text: The bitcoin address to use for the private key.
+        example: mjUq15ga1EwCXJUHs2QiYhhrxTansS3Rc7
+      - name: message
+        text: The message to create a signature of
+        example: Hello world!
+    result: Base64

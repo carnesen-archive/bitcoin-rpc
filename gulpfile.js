@@ -10,6 +10,7 @@ var shell = require('gulp-shell');
 var files = ['lib/**/*.js'];
 var unitTests = ['test/**/*.js'];
 var integrationTests = ['integration/**/*.js'];
+var performanceTests = ['performance/**/*.js'];
 var alljs = files.concat(unitTests).concat(integrationTests);
 
 var buildBinPath = './node_modules/.bin/';
@@ -24,6 +25,10 @@ gulp.task('test:node', function() {
 
 gulp.task('test:integration', function() {
   return gulp.src(integrationTests).pipe(new mocha({ reporter: 'spec' }));
+});
+
+gulp.task('test:performance', function() {
+  return gulp.src(performanceTests).pipe(new mocha({ reporter: 'spec' }));
 });
 
 gulp.task('test', ['test:node']);

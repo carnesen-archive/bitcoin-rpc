@@ -1,0 +1,73 @@
+---
+
+group: Util
+
+text: Utility methods
+
+methods:
+
+  CreateMultiSig:
+    text: Creates a multi-signature address with n signature of m keys required.
+    params:
+      - name: nRequired
+        text: The number of required signatures out of the m keys or addresses
+        example: 2
+      - name: bitcoinAddresses
+        text: Array of keys which are bitcoin addresses or hex-encoded public keys
+        type: [ BitcoinAddress ]
+        alias: keys
+        example:
+          - 0237d2c66949f1588724c01821bc8c15e6f5395379598e2a276834dd519d144f0b
+          - 0217854fb06d1bb1dd6589e0fe1826800eb18c4b5c8f5a60544ffe1244dde88bcf
+          - 02a71693f23c1b3ce2e4dcd23f594f5bad2feb221a6653c95b35fc59ea7bc580f2
+    result:
+      multiSigAddress: { text: The value of the new multisig address, alias: address }
+      redeemScript: { alias: redeemScript, text: The redemption script }
+
+  EstimateFee:
+    text: |
+      Estimates the approximate fee (BTC per kB) needed for a transaction
+      to begin confirmation within nBlocks blocks. -1.0 is returned if not
+      enough transactions and blocks have been observed to make an estimate.
+    params:
+      - name: nBlocks
+        example: 0
+    result: FeeRate
+
+  EstimatePriority:
+    text: |
+      Estimates the priority a zero-fee transaction needs to begin confirmation
+      within nBlocks blocks. -1.0 is returned if not enough transactions and
+      blocks have been observed to make an estimate.
+    params:
+      - name: nBlocks
+        example: 0
+    result: Priority
+
+  ValidateAddress:
+    text: Return information about the given bitcoin address.
+    params:
+      - name: bitcoinAddress
+        example: 19zc6mD19EiKgCbkbsd9h4jZuaYnezxBn6
+    result:
+      isValid: { text: If not valid (false), this is the only property returned }
+      bitcoinAddress: { text: The bitcoin address validated, default: null }
+      isMine: { text: true if the key is yours, default: null }
+      isScript: { text: true if the key is a script, default: null }
+      pubKey: { text: The public key, default: null }
+      isCompressed: { text: true if the address is compressed, default: null }
+      account: { text: The account associated with the address, default: null }
+
+  VerifyMessage:
+    text: Verify a signed message
+    params:
+      - name: bitcoinAddress
+        text: The bitcoin address to use for the signature
+        example: mkRLiFtiEzuqaC7hDUNMwTniMTUhq9xpK7
+      - name: signature
+        text: The signature provided by the signer in base 64 encoding (see SignMessage)
+        example: IBg10OGB9S5d5Yn3iybUaAvdl1B+01S7kY4tVNSME1TZdXMsdC7FWVt/7StDZ26hsUgxJsPhRBgdL24xKSVxip0=
+      - name: message
+        text: The message that was signed
+        example: bitcoin!
+    result: Boolean

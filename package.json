@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "async": "0.9.0",
-    "bitcoin-rpc-spec": "^0.2.0",
     "bitcore": "^0.11.4",
     "config": "^1.12.0",
     "js-yaml": "^3.2.7",

@@ -1,0 +1,113 @@
+---
+
+group: Network
+
+text: Methods related to the Bitcoin peer to peer network
+
+methods:
+  addNode:
+    text: |
+      Attempts add or remove a node from the addnode list.
+      Or try a connection to a node once.
+    params:
+      - name: address
+        text: Address of the node, gotten from GetPeerInfo for example
+        example: 1.2.3.4:56789
+      - name: command
+        text: add, remove, or onetry
+        example: onetry
+    result: None
+
+  GetAddedNodeInfo:
+    text: |
+      Returns information about the given added node, or all added nodes.
+      Note that "onetry" addnodes are not listed here.
+    params:
+      - name: verbose
+        type: Boolean
+        example: true
+      - name: node
+        text: If provided, return information about only this node
+        default: null
+        type: String
+    result:
+      addedNode: { text: The node address }
+      isConnected: { default: null }
+      addresses:
+        default: null
+        type:
+          address: { text: the bitcoin server host and port }
+          connectionDirection: { text: inbound or outbound, alias: connected }
+
+  GetConnectionCount:
+    text: Returns the number of connections to other nodes.
+    result: Integer
+
+  GetNetTotals:
+    text: |
+      Returns information about network traffic, including
+      bytes in, bytes out, and current time.
+    result:
+      nBytesReceived: { alias: totalbytesrecv }
+      nBytesSent: { alias: totalbytessent }
+      CpuMilliseconds: { alias: timemillis }
+
+  GetNetworkInfo:
+    text: |
+      Returns an object containing various state info regarding P2P networking.
+    result:
+      serverVersion: { alias: version }
+      serverSubVersion: { type: String, alias: subversion }
+      protocolVersion:
+      localServices: { text: the services we offer to the network }
+      timeOffsetSeconds:
+      nConnections:
+      networks:
+        type:
+          protocol: { alias: name, text: ipv4, ipv6 or onion }
+          isLimited: { text: Is the network limited using -onlynet }
+          isReachable:
+          proxy: { text: The proxy that is used for this network, or empty if none }
+      relayFeeRate:
+        alias: relayfee
+        text: minimum relay fee for non-free transactions in btc/kb
+      localAddresses:
+        type:
+          address:
+          port:
+          relativeScore:
+
+  GetPeerInfo:
+    text: Returns information about each connected peer
+    result:
+      index: { alias: id }
+      address: { text: The ip address and port of the peer, alias: addr }
+      localAddress: { alias: addrlocal }
+      services: { text: The services offered }
+      lastSendTime: { alias: lastsend, text: Unix time of the last send to this node }
+      lastReceiveTime: { alias: lastrecv, text: Unix time of the last receive from this node }
+      nBytesSent: { text: Total bytes sent }
+      nBytesReceived: { alias: bytesrecv, text: Total bytes received }
+      connectedTime: { alias: conntime, text: Unix time that we connected to this node }
+      pingTimeSeconds: { text: ping messages are processed in a queue with all others }
+      pingWaitSeconds: { text: ping measures not just network lag but also queue backlog }
+      serverVersion: { alias: version, text: The peer server version }
+      serverSubVersion: { type: String, alias: subver, text: The string server version }
+      isInbound: { alias: inbound, text: Inbound (true) or Outbound (false) }
+      startingHeight: { text: The starting height (block) of the peer }
+      banScore:
+      nSynchedHeaders:
+        alias: synched_headers
+        text: Height of last header we have in common with this peer
+      nSynchedBlocks:
+        alias: synched_blocks
+        text: Height of last block we have in common with this peer
+      inFlight:
+        text: The heights of blocks we're currently asking from this peer
+
+  Ping:
+    text: |
+      Requests that a ping be sent to all other nodes to measure ping time. The ping
+      command is handled in queue with all other commands, so it measures processing
+      backlog, not just network ping.
+    result: None

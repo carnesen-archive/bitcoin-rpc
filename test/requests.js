@@ -2,8 +2,7 @@
 
 var should = require('chai').should();
 
-var spec = require('bitcoin-rpc-spec');
-var methods = spec.methods;
+var methods = require('../lib/methods');
 var Requests = require('../lib/requests');
 
 describe('Requests', function() {
@@ -18,7 +17,7 @@ describe('Requests', function() {
     should.exist(r);
   });
 
-  it('asdf', function () {
+  it('spot check GetInfo', function () {
     var r = Requests.create();
     r.GetInfo()
   });
