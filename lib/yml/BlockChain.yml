@@ -124,13 +124,13 @@ methods:
   GetTxOutSetInfo:
     text: Get details about the unspent transaction result set
     result:
-      - bestBlockHeight: { alias: height }
-        bestBlockHash: { alias: bestblock }
-        nTransactions: { alias: transactions }
-        nTxOuts:
-        nBytes: { alias: bytes_serialized }
-        hash: { alias: hash_serialized }
-        totalBTC: { alias: total_amount}
+      bestBlockHeight: { alias: height }
+      bestBlockHash: { alias: bestblock }
+      nTransactions: { alias: transactions }
+      nTxOuts:
+      nBytes: { alias: bytes_serialized }
+      hash: { alias: hash_serialized }
+      totalBTC: { alias: total_amount}
 
   VerifyChain:
     text: Verifies the block chain database

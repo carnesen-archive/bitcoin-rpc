@@ -5,7 +5,7 @@ group: Network
 text: Methods related to the Bitcoin peer to peer network
 
 methods:
-  addNode:
+  AddNode:
     text: |
       Attempts add or remove a node from the addnode list.
       Or try a connection to a node once.
