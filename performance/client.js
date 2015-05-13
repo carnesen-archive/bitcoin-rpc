@@ -10,35 +10,33 @@ var requests = rpc.requests;
 
 var client = rpc.Client.create(config.get('client'));
 
+describe('GetBlock', function() {
 
-function getInfo() {
+  this.timeout(20000);
+
+  var blockIds;
+  before(function(done) {
+    var heights = [];
+    for (var i = 0; i < 50000; i++) {
+      heights.push(i);
+    }
+    async.mapLimit(heights, 1000, function(height, cb) {
+      client.sendRequest(requests.GetBlockHash(height), cb);
+    },
+    function(err, results) {
+      if (err) return done(err);
+      blockIds = results;
+      done();
+    });
+  });
+
   it('GetInfo', function(done) {
-    var request = requests.GetInfo();
-    client.sendRequest(request, function (err, ret) {
-      if (err) {
-        console.log(err);
-        return done();
-      }
+    async.mapLimit(blockIds, 100, function(blockId, cb) {
+      client.sendRequest(requests.GetBlock(blockId), cb);
+    },
+    function(err) {
+      if (err) return done(err);
       done();
     });
   });
-}
-
-function getBlockHash() {
-  it('GetBlockHash', function(done) {
-    var request = requests.GetBlockHash('1');
-    console.log('asdf')
-    client.sendRequest(request, function (err, ret) {
-      if (err) {
-        console.log(err);
-        return done();
-      }
-      done();
-    });
-  });
-}
-
-describe('Client performance tests', function() {
-  this.timeout(10000);
-  async.series([getInfo, getBlockHash], console.log);
 });
