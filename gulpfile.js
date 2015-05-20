@@ -1,54 +1,18 @@
 'use strict';
 
+var mocha = require('mocha');
 var gulp = require('gulp');
 
-var coveralls = require('gulp-coveralls');
-var jshint = require('gulp-jshint');
-var mocha = require('gulp-mocha');
-var shell = require('gulp-shell');
-
-var files = ['lib/**/*.js'];
-var unitTests = ['test/**/*.js'];
-var integrationTests = ['integration/**/*.js'];
-var performanceTests = ['performance/**/*.js'];
-var alljs = files.concat(unitTests).concat(integrationTests);
-
-var buildBinPath = './node_modules/.bin/';
-
-/**
- * testing
- */
-
-gulp.task('test:node', function() {
-  return gulp.src(unitTests).pipe(new mocha({ reporter: 'spec' }));
-});
+var bitcoreTasks = require('bitcore-build');
 
 gulp.task('test:integration', function() {
-  return gulp.src(integrationTests).pipe(new mocha({ reporter: 'spec' }));
+  return gulp.src('integration/**/*.js').pipe(new mocha({ reporter: 'spec' }));
 });
 
 gulp.task('test:performance', function() {
-  return gulp.src(performanceTests).pipe(new mocha({ reporter: 'spec' }));
+  return gulp.src('performance/**/*.js').pipe(new mocha({ reporter: 'spec' }));
 });
 
-gulp.task('test', ['test:node']);
-
-/**
- * code quality and documentation
- */
-
-gulp.task('lint', function() {
-  return gulp.src(alljs)
-    .pipe(jshint())
-    .pipe(jshint.reporter('default'));
-});
-
-gulp.task('plato', shell.task([buildBinPath + 'plato --dir report --recurse --jshint .jshintrc lib']));
-
-gulp.task('coverage', shell.task([buildBinPath + './istanbul cover ' + buildBinPath + '_mocha -- --recursive']));
-
-gulp.task('coveralls', ['coverage'], function() {
-  gulp.src('coverage/lcov.info').pipe(coveralls());
-});
+bitcoreTasks('rpc', {});
 
 gulp.task('default', ['lint', 'coverage']);

@@ -5,7 +5,7 @@ var config = require('config');
 var chai = require('chai');
 chai.should();
 
-var methods = require('../lib/methods');
+var methods = require('../lib/spec').methods;
 
 var rpc = require('../lib');
 var requests = rpc.requests;
