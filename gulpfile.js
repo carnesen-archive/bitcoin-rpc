@@ -13,6 +13,6 @@ gulp.task('test:performance', function() {
   return gulp.src('performance/**/*.js').pipe(new mocha({ reporter: 'spec' }));
 });
 
-bitcoreTasks('rpc', {});
+bitcoreTasks('rpc', {skipBrowser: true});
 
 gulp.task('default', ['lint', 'coverage']);
