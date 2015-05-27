@@ -7,7 +7,7 @@ chai.should();
 
 var methods = require('../lib/spec').methods;
 
-var rpc = require('../lib');
+var rpc = require('../index');
 var requests = rpc.requests;
 
 var client = rpc.Client.create(config.get('client'));

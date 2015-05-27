@@ -3,7 +3,7 @@
 
 var config = require('config');
 
-var rpc = require('../lib');
+var rpc = require('../index');
 var requests = rpc.requests;
 var methods = rpc.spec.methods;
 var groups = rpc.spec.groups;
