@@ -1,5 +1,7 @@
 ---
 
+# This is only used for the command-line interface bin/cli.js
+
 client:
   host: localhost
   username: username

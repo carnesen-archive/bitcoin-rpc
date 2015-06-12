@@ -20,8 +20,4 @@ describe('Method', function() {
     should.exist(m)
   });
 
-  it('throws Invalid Argument if no name are provided', function () {
-    Method.create.should.throw('Invalid Argument');
-  });
-
 });

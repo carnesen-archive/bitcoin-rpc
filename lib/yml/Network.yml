@@ -80,30 +80,33 @@ methods:
   GetPeerInfo:
     text: Returns information about each connected peer
     result:
-      index: { alias: id }
-      address: { text: The ip address and port of the peer, alias: addr }
-      localAddress: { alias: addrlocal }
-      services: { text: The services offered }
-      lastSendTime: { alias: lastsend, text: Unix time of the last send to this node }
-      lastReceiveTime: { alias: lastrecv, text: Unix time of the last receive from this node }
-      nBytesSent: { text: Total bytes sent }
-      nBytesReceived: { alias: bytesrecv, text: Total bytes received }
-      connectedTime: { alias: conntime, text: Unix time that we connected to this node }
-      pingTimeSeconds: { text: ping messages are processed in a queue with all others }
-      pingWaitSeconds: { text: ping measures not just network lag but also queue backlog }
-      serverVersion: { alias: version, text: The peer server version }
-      serverSubVersion: { type: String, alias: subver, text: The string server version }
-      isInbound: { alias: inbound, text: Inbound (true) or Outbound (false) }
-      startingHeight: { text: The starting height (block) of the peer }
-      banScore:
-      nSynchedHeaders:
-        alias: synched_headers
-        text: Height of last header we have in common with this peer
-      nSynchedBlocks:
-        alias: synched_blocks
-        text: Height of last block we have in common with this peer
-      inFlight:
-        text: The heights of blocks we're currently asking from this peer
+      dictionary:
+        key: String
+        value:
+          id: { alias: id }
+          address: { text: The IP address and port of the peer, alias: addr }
+          localAddress: { text: Our IP address and port, alias: addrlocal }
+          services: { text: The services offered }
+          lastSendTime: { alias: lastsend, text: Unix time of the last send to this node }
+          lastReceiveTime: { alias: lastrecv, text: Unix time of the last receive from this node }
+          nBytesSent: { text: Total bytes sent }
+          nBytesReceived: { alias: bytesrecv, text: Total bytes received }
+          connectedTime: { alias: conntime, text: Unix time that we connected to this node }
+          pingTimeSeconds: { text: ping messages are processed in a queue with all others }
+          pingWaitSeconds: { text: ping measures not just network lag but also queue backlog }
+          serverVersion: { alias: version, text: The peer server version }
+          serverSubVersion: { type: String, alias: subver, text: The string server version }
+          isInbound: { alias: inbound, text: Inbound (true) or Outbound (false) }
+          startingHeight: { text: The starting height (block) of the peer }
+          banScore:
+          nSynchedHeaders:
+            alias: synched_headers
+            text: Height of last header we have in common with this peer
+          nSynchedBlocks:
+            alias: synched_blocks
+            text: Height of last block we have in common with this peer
+          inFlight:
+            text: The heights of blocks we're currently asking from this peer
 
   Ping:
     text: |
