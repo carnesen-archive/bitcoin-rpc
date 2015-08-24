@@ -1,9 +1,8 @@
 'use strict';
 
-var mocha = require('mocha');
 var gulp = require('gulp');
 
-var bitcoreTasks = require('bitcore-build');
+require('simple-syrup-dev').defineGulpTasks(gulp);
 
 //gulp.task('test:integration', function() {
 //  //console.log(gulp.src(['integration/**/*.js']).pipe(new mocha({ reporter: 'spec' })))
@@ -14,6 +13,3 @@ var bitcoreTasks = require('bitcore-build');
 //  return gulp.src('performance/**/*.js').pipe(new mocha({ reporter: 'spec' }));
 //});
 //
-bitcoreTasks('rpc', {skipBrowser: true});
-
-gulp.task('default', ['lint', 'coverage']);

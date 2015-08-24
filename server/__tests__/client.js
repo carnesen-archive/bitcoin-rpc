@@ -1,12 +1,12 @@
 'use strict';
 
-var chai = require('chai');
-var should = chai.should();
-var sinon = require('sinon');
+require('simple-syrup-dev').should();
 
-var Request = require('../lib/request');
+var sinon = require('simple-syrup-dev').sinon;
 
-var Client = require('../lib/client');
+var Request = require('../request');
+
+var Client = require('../client');
 
 describe('Client', function() {
 
@@ -22,21 +22,6 @@ describe('Client', function() {
     };
     clientMock = Client.create();
     clientMock.httpClient = httpClientMock;
-  });
-
-  it('instantiates from constructor', function() {
-    var client = new Client({});
-    should.exist(client);
-  });
-
-  it('instantiates from create', function() {
-    var client = Client.create();
-    should.exist(client);
-  });
-
-  it('instantiates from create with opts', function() {
-    var client = Client.create({foo: 'bar'});
-    should.exist(client);
   });
 
   it('sendRequest serializes the request', function () {

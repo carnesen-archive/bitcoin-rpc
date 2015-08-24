@@ -1,25 +1,15 @@
 'use strict';
 
-var chai = require('chai');
-var should = chai.should();
+require('simple-syrup-dev').should();
 
-var Field = require('../../lib/method/field');
-var Scalar = require('../../lib/method/scalar');
+var Field = require('../field');
+var Scalar = require('../scalar');
 
 describe('Field', function() {
 
   var f;
   beforeEach(function() {
     f = new Field('foo');
-  });
-
-  it('instantiates from constructor', function() {
-    should.exist(f);
-  });
-
-  it('instantiates from create', function() {
-    f = Field.create('foo');
-    should.exist(f)
   });
 
   it('throws "no default" on serialize if no data or default is provided', function() {

@@ -1,9 +1,8 @@
 'use strict';
 
-var chai = require('chai');
-chai.should();
+require('simple-syrup-dev').should();
 
-var methods = require('../lib/spec').methods;
+var methods = require('../spec').methods;
 
 describe('methods', function() {
 

@@ -2,11 +2,10 @@
 
 var http = require('http');
 var EventEmitter = require('events').EventEmitter;
-var sinon = require('sinon');
-var chai = require('chai');
-var should = chai.should();
+var sinon = require('simple-syrup-dev').sinon;
+require('simple-syrup-dev').should();
 
-var HttpClient = require('../lib/http');
+var HttpClient = require('../http');
 
 describe('HttpClient', function() {
 
@@ -26,21 +25,6 @@ describe('HttpClient', function() {
     var httpMock = { request: sinon.stub().returns(requestMock) };
     clientMock = HttpClient.create();
     clientMock.protocol = httpMock;
-  });
-
-  it('instantiates from constructor', function() {
-    var client = new HttpClient();
-    should.exist(client);
-  });
-
-  it('instantiates from create', function() {
-    var client = HttpClient.create();
-    should.exist(client);
-  });
-
-  it('instantiates from create with opts', function() {
-    var client = HttpClient.create({foo: 'bar'});
-    should.exist(client);
   });
 
   it('defaults to http', function() {

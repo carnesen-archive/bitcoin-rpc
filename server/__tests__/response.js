@@ -1,11 +1,10 @@
 'use strict';
 
-var chai = require('chai');
-var should = chai.should();
+require('simple-syrup-dev').should();
 
-var Response = require('../lib/response');
-var Request = require('../lib/request');
-var Method = require('../lib/method');
+var Response = require('../response');
+var Request = require('../request');
+var Method = require('../method');
 
 describe('Response', function() {
 
@@ -14,15 +13,6 @@ describe('Response', function() {
     var methodMock = new Method('GetFoo');
     requestMock = new Request({method: methodMock});
     responseMock = Response.create(requestMock);
-  });
-
-  it('instantiates from constructor', function() {
-    var response = new Response(requestMock);
-    should.exist(response);
-  });
-
-  it('instantiates from create', function() {
-    should.exist(responseMock);
   });
 
   it('sets id', function() {
