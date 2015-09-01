@@ -1,9 +1,9 @@
 'use strict';
 
 var BitcoinRPC = {
-  Client: require('./lib/client'),
-  requests: require('./lib/requests').create(),
-  spec: require('./lib/spec')
+  Client: require('./server/client'),
+  requests: require('./server/requests').create(),
+  spec: require('./server/spec')
 };
 
 module.exports = BitcoinRPC;
