@@ -1,7 +1,5 @@
 'use strict';
 
-var _ = require('lodash');
-
 var Params = require('./params');
 var Field = require('./field');
 

@@ -4,10 +4,18 @@
   "version": "0.3.0",
   "main": "lib/index.js",
   "scripts": {
-    "build": "webpack",
-    "build:watch": "webpack --watch",
     "lint": "eslint src",
     "test": "npm run lint && npm run build"
+  },
+  "dependencies": {
+    "js-yaml": "3.6.1",
+    "lodash": "4.13.1"
+  },
+  "devDependencies": {
+    "babel-core": "6.10.4",
+    "babel-loader": "6.2.4",
+    "eslint": "3.0.1",
+    "eslint-config-carnesen": "1.0.2"
   },
   "author": {
     "name": "Chris Arnesen",
@@ -21,14 +29,5 @@
     "url": "https://github.com/carnesen/bitcoin-rpc/issues"
   },
   "homepage": "https://github.com/carnesen/bitcoin-rpc",
-  "license": "MIT",
-  "dependencies": {},
-  "devDependencies": {
-    "babel-core": "6.10.4",
-    "babel-loader": "6.2.4",
-    "eslint": "3.0.1",
-    "eslint-config-carnesen": "1.0.1",
-    "webpack": "1.13.1",
-    "webpack-node-externals": "1.2.0"
-  }
+  "license": "MIT"
 }

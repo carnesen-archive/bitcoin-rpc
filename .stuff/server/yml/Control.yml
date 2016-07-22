@@ -6,36 +6,33 @@ text: Includes "Stop" "Help" and "GetInfo"
 
 methods:
 
-  GetInfo:
-    text: Get state information about the server
+  getInfo:
+    description: Get state information about the server
     result:
-      serverVersion: { alias: version }
+      version:
       protocolVersion:
       walletVersion:
-      balanceBTC: { alias: balance }
-      nBlocksProcessed: { alias: blocks }
+      balance: btc
+      blocks: integer
       timeOffset:
-      nConnections:
+      connections: integer
       proxy:
       difficulty:
-      isTestnet:
-      oldestKeyTime: { alias: keypoololdest }
-      nKeys: { alias: keypoolsize }
-      unlockedUntilTime:
-        text: |
+      testnet: boolean
+      keyPoolOldest:
+      keyPoolSize:
+      unlocked_until:
+        description: |
           Unix time until which the wallet is unlocked for transfers.
           0 if locked. Null if not encrypted)
-        alias: unlocked_until
-        default: null
-      payFeeRate: { alias: paytxfee }
-      minimumRelayFeeRate: { alias: relayfee }
-      errors: { type: String }
+      payTxFee:
+      relayFee:
+      errors: string
 
-  Help:
+  help:
     text: Get usage information for an RPC method
     params:
       - name: method
-        type: MethodName
-        default: null
-        text: name of the method or omit for a list of all methods and brief usage
-    result: String
+        type: methodName
+        description: name of the method or omit for a list of all methods and brief usage
+    result: string

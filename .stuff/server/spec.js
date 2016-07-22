@@ -43,4 +43,7 @@ var spec = {
   methods: methods,
   groups: groups
 };
+
+console.log(JSON.stringify(spec, null, 2))
+
 module.exports = spec;
