@@ -2,20 +2,23 @@
   "name": "bitcoin-rpc",
   "description": "An RPC Client for Bitcoin Core",
   "version": "0.3.0",
-  "main": "lib/index.js",
+  "main": "src/index.js",
   "scripts": {
-    "lint": "eslint src",
-    "test": "npm run lint && npm run build"
+    "lint": "eslint src --config carnesen",
+    "test": "npm run lint && npm run test:server",
+    "test:server": "cross-env NODE_ENV=test mocha src/**/__tests__/**/*.test.js"
   },
   "dependencies": {
+    "expand-home-dir": "0.0.3",
     "js-yaml": "3.6.1",
-    "lodash": "4.13.1"
+    "node-fetch": "1.5.3"
   },
   "devDependencies": {
-    "babel-core": "6.10.4",
-    "babel-loader": "6.2.4",
+    "chai": "3.5.0",
+    "cross-env": "1.0.8",
     "eslint": "3.0.1",
-    "eslint-config-carnesen": "1.0.2"
+    "eslint-config-carnesen": "1.0.2",
+    "mocha": "2.5.3"
   },
   "author": {
     "name": "Chris Arnesen",
