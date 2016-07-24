@@ -45,20 +45,18 @@ module.exports = function createCookieClient({ cookieFile, host, port }) {
         params: argArr
       });
 
-      try {
-        const response = yield fetch(url, {
-          headers: {
-            cookie,
-            'content-type': 'application/json',
-            'accepts': 'application/json'
-          },
-          body
-        });
-      } catch (e) {
-        
-      }
-    };
+      const response = yield fetch(url, {
+        headers: {
+          cookie,
+          'content-type': 'application/json',
+          'accepts': 'application/json'
+        },
+        body
+      });
 
+      return yield response.json();
+
+    });
   });
 
   return client;

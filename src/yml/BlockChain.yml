@@ -148,9 +148,9 @@ methodMap:
       - name: outputIndex
         type: integer
 
-      - name: doIncludeMemPool
+      - name: includeMemPool
         description: Whether (true) or not (false) to include mempool transactions
-        example: false
+        type: boolean
 
     result:
 

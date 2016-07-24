@@ -1,22 +1,11 @@
 'use strict';
 
-const { readFileSync } = require('fs');
+const createClient = require('./createClient');
 
-const { parse } = require('ini');
+Object.assign(createClient, {
+  constants: require('./constants'),
+  methods: require('./methods'),
+  util: require('./util')
+});
 
-const defaults = require('./defaults');
-const methods = require('./methods');
-
-module.exports = function createClient(options) {
-
-  if (typeof options === 'undefined') {
-    options = { dataDir: defaults.dataDir }
-  }
-
-  // validate options
-
-  const { confFile, cookieFile, dataDir, rpcUser, rpcPassword, port, host } = options;
-
-
-
-};
+module.exports = createClient;

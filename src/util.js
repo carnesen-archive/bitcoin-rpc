@@ -26,6 +26,8 @@ module.exports = {
 
   isUndefined(value) {
     return typeof value === 'undefined';
-  }
+  },
+
+  writeFile: promisify(fs.writeFile)
 
 };

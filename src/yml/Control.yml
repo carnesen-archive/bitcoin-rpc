@@ -2,7 +2,7 @@
 
 group: Control
 
-text: Includes "Stop" "Help" and "GetInfo"
+description: Includes "Stop" "Help" and "GetInfo"
 
 methodMap:
 
@@ -30,9 +30,9 @@ methodMap:
       errors: string
 
   help:
-    text: Get usage information for an RPC method
+    description: Get usage information for an RPC method
     params:
       - name: method
-        type: methodName
+        type: string
         description: name of the method or omit for a list of all methods and brief usage
     result: string

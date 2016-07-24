@@ -9,9 +9,14 @@ const ymlDir = join(__dirname, 'yml');
 const methods = [];
 
 readdirSync(ymlDir).forEach(fileName => {
-  const { methodMap, group } = safeLoad(readFileSync(join(ymlDir, fileName)));
+  const { methodMap } = safeLoad(readFileSync(join(ymlDir, fileName)));
   Object.keys(methodMap).forEach(name => {
-    methods.push(Object.assign(methodMap[name]), { group, name });
+    const method = methodMap[name];
+    Object.assign(method, {
+      name,
+      params: method.params || []
+    });
+    methods.push(method);
   })
 });
 

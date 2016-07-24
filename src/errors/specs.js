@@ -2,8 +2,7 @@
 
 module.exports = {
 
-  REQUIRED_PARAMETER: 'Parameter "%s" is required',
-
-  NO_COOKIE: 'Failed to read cookie file %s'
+  NO_COOKIE: 'Failed to read cookie file %s',
+  REQUIRED_PARAMETER: 'Parameter "%s" is required'
 
 };
