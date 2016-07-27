@@ -24,10 +24,6 @@ module.exports = {
 
   readFile: promisify(fs.readFile),
 
-  isUndefined(value) {
-    return typeof value === 'undefined';
-  },
-
   writeFile: promisify(fs.writeFile)
 
 };
