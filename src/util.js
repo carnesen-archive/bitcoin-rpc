@@ -22,8 +22,10 @@ module.exports = {
     return new Buffer(input, 'utf8').toString('base64')
   },
 
-  readFile: promisify(fs.readFile),
+  isUndefined(value) {
+    return typeof value === 'undefined';
+  },
 
-  writeFile: promisify(fs.writeFile)
+  readFile: promisify(fs.readFile)
 
 };

@@ -9,6 +9,7 @@
     "test:server": "cross-env NODE_ENV=test mocha src/**/__tests__/**/*.test.js"
   },
   "dependencies": {
+    "bitcoin-constants": "0.0.1",
     "co": "4.6.0",
     "debug": "2.2.0",
     "expand-home-dir": "0.0.3",

@@ -1,32 +1,24 @@
 'use strict';
 
 const fetch = require('node-fetch');
-const { wrap } = require('co');
 
-const constants = require('./constants');
 const errors = require('./errors');
 const methods = require('./methods');
-const { isUndefined, readFile } = require('./util');
+const util = require('./util');
 
-module.exports = function createCookieClient({ url, rpccookiefile }) {
+module.exports = function createBasicClient({ url, headers }) {
 
   const client = {};
 
-  let cookie;
-
   methods.forEach(method => {
 
-    client[method.name] = wrap(function* (argObject) {
+    client[method.name] = function (argObj) {
 
-      if (!cookie) {
-        cookie = yield readFile(rpccookiefile, { encoding: 'utf8' });
-      }
+      argObj = argObj || {};
 
-      argObject = argObject || {};
-
-      const argArray = method.params.map(param => {
-        const value = argObject[param.name] || param.default;
-        if (isUndefined(value)) {
+      const argArr = method.params.map(param => {
+        const value = argObj[param.name] || param.default;
+        if (util.isUndefined(value)) {
           throw new errors.REQUIRED_PARAMETER(param.name);
         }
       });
@@ -36,20 +28,21 @@ module.exports = function createCookieClient({ url, rpccookiefile }) {
       const body = JSON.stringify({
         id,
         method: method.name.toLowerCase(),
-        params: argArray
+        params: argArr
       });
 
       const response = yield fetch(url, {
         headers: {
           cookie,
+          'accepts': 'application/json',
+          'content-type': 'application/json',
           'content-length': body.length
         },
         body
       });
 
       return yield response.json();
-    });
-
+    }
   });
 
   return client;
