@@ -2,6 +2,6 @@
 
 const debug = require('debug');
 
-const { name } = require('../package.json');
+const { moduleName } = require('./constants');
 
-module.exports = debug(name);
+module.exports = debug(moduleName);

@@ -4,9 +4,12 @@ const fetch = require('node-fetch');
 
 const errors = require('./errors');
 const methods = require('./methods');
-const util = require('./util');
 
-module.exports = function createBasicClient({ url, headers }) {
+function base64Encode(input) {
+  return new Buffer(input, 'utf8').toString('base64')
+}
+
+module.exports = function createBasicClient({ url, rpcuser, rpcpassword }) {
 
   const client = {};
 

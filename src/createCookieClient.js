@@ -6,7 +6,6 @@ const { wrap } = require('co');
 const constants = require('./constants');
 const errors = require('./errors');
 const methods = require('./methods');
-const { isUndefined, readFile } = require('./util');
 
 module.exports = function createCookieClient({ url, rpccookiefile }) {
 

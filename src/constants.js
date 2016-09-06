@@ -1,6 +1,10 @@
 'use strict';
 
+const { moduleName } = require('../package.json');
+
 module.exports = {
+
+  moduleName,
 
   headers: {
     'accepts': 'application/json',
