@@ -2,8 +2,8 @@
 
 const fetch = require('node-fetch');
 
-const errors = require('./errors');
-const methods = require('./methods');
+const errors = require('./errors/index');
+const methods = require('./../../src/methods');
 
 function base64Encode(input) {
   return new Buffer(input, 'utf8').toString('base64')

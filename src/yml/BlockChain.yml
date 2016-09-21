@@ -13,7 +13,7 @@ methodMap:
 
   getBlock:
 
-    params:
+    parameters:
       - name: hash
         description: Hash of the block
         type: hash
@@ -68,7 +68,7 @@ methodMap:
 
     description: Get hash of block in best-block-chain at index provided
 
-    params:
+    parameters:
 
       - name: height
         description: Block index (height)
@@ -127,7 +127,7 @@ methodMap:
 
     description: List of transactions in the memory pool
 
-    params:
+    parameters:
 
       - name: verbose
         description: true for details about each transaction, false for hash only
@@ -140,7 +140,7 @@ methodMap:
 
     description: Get details about an unspent transaction output (UTXO)
 
-    params:
+    parameters:
 
       - name: hash
         type: hash
@@ -183,7 +183,7 @@ methodMap:
 
     description: Verifies the block chain database
 
-    params:
+    parameters:
 
       - name: checkLevel
         description: How thorough the block verification is (0-4)

@@ -14,7 +14,7 @@ readdirSync(ymlDir).forEach(fileName => {
     const method = methodMap[name];
     Object.assign(method, {
       name,
-      params: method.params || []
+      parameters: method.parameters || []
     });
     methods.push(method);
   })

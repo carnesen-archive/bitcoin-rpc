@@ -9,8 +9,10 @@
     "test:unit": "cross-env NODE_ENV=test mocha src/**/__tests__/**/*.test.js"
   },
   "dependencies": {
+    "@carnesen/bitcoin-conf": "0.0.1",
+    "@carnesen/fs": "0.0.1",
+    "@carnesen/util": "0.0.3",
     "co": "4.6.0",
-    "debug": "2.2.0",
     "node-fetch": "1.6.0"
   },
   "devDependencies": {

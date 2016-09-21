@@ -31,7 +31,7 @@ methodMap:
 
   help:
     description: Get usage information for an RPC method
-    params:
+    parameters:
       - name: method
         type: string
         description: name of the method or omit for a list of all methods and brief usage
