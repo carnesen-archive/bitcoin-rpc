@@ -7,14 +7,19 @@ const {
   isDefined,
 } = require('@carnesen/util')
 
-const {methods} = require('../index')
+const methods = require('../methods')
+
+const TYPES = ['string', 'number', 'boolean', 'array', 'object']
 
 function assertParameter (parameter) {
   assertNonEmptyObject(parameter)
   assertCamelCasedString(parameter.name, 'parameter name')
   assertNonEmptyString(parameter.description, 'parameter description')
-  if (!['string', 'number'].includes(parameter.type)) {
-    throw createTypeError('parameter type', 'either "string" or "number"')
+  if (!TYPES.includes(parameter.type)) {
+    throw createTypeError('parameter type', `one of ${TYPES}`)
+  }
+  if (parameter.type === 'array' && !TYPES.includes(parameter.itemType)) {
+    throw createTypeError('array parameter itemType', `one of ${TYPES}`)
   }
 }
 

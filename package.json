@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint src --config carnesen",
     "test": "npm run lint && npm run test:server",
-    "test:unit": "cross-env NODE_ENV=test mocha src/**/__tests__/**/*.test.js"
+    "test:unit": "NODE_ENV=test mocha --opts test/mocha.opts"
   },
   "dependencies": {
     "@carnesen/bitcoin-conf": "0.0.1",

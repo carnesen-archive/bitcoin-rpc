@@ -1,35 +1,193 @@
 ---
 
-- name: getInfo
-  description: Get state information about the server
-
-- name: getMemoryInfo
-  description: Get information about memory usage
-
-- name: help
-  description: List all available RPC commands or get help for the specified RPC
+- name: abandonTransaction
+  description: Abandon an in-wallet transaction and its descendants, allowing their inputs to be respent
   parameters:
-    - name: methodName
-      description: name of the method or omit for a list of all methods and brief usage
+    - name: txid
+
+- name: addMultiSigAddress
+  description: Add a multisignature address to the wallet, returning an address associated with the keys provided
+  parameters:
+    - name: nRequired
+      description: The number (m) of required signatures out of the n keys or addresses
+      type: number
+
+    - name: keysOrAddresses
+      description: An array of base58check-encoded private keys or addresses
+      type: array
+      itemType: string
+
+    - name: account
+
+- name: addNode
+  description: Attempts add, remove or connect once to a node
+  parameters:
+    - name: host
+
+    - name: command
+      description: What to do with the node (add, remove, or onetry)
       type: string
 
-- name: stop
-  description: Safely shut down the Bitcoin server
+- name: addWitnessAddress
+  description: Add a witness address for a script (with pubkey or redeem script known)
+  parameters:
+    - name: address
+
+- name: backupWallet
+  description: Safely copies wallet.dat to destination
+  parameters:
+    - name: destination
+      type: string
+      description: Can be a directory or a path with filename
+
+- name: bumpFee
+  description: Replace an unconfirmed wallet transaction that signaled RBF with a new transaction that pays a higher fee
+  parameters:
+    - name: txid
+
+    - name: options
+      description: Additional options
+      type: object
+
+- name: clearBanned
+  description: Clear the list of banned nodes
+
+- name: createMultiSig
+  description: Create a P2SH multi-signature address
+  parameters:
+    - name: nRequired
+      description: Minimum number (m) of signatures required to spend this m-of-n multisig script
+      type: number
+
+    - name: keysOrAddresses
+      description: Array of keys or addresses against which signature will be checked
+      type: array
+      itemType: string
+
+- name: createRawTransaction
+  description: Create an unsigned serialized transaction that spends a previous output to a new output
+  parameters:
+    - name: inputs
+      description: Array of objects to be used as an input to the transaction
+      type: array
+      itemType: object
+
+- name: decodeRawTransaction
+  description: Parses the serialized transaction provided and returns an object
+  parameters:
+    - name: transaction
+
+- name: decodeScript
+  description: Decode a hex-encoded P2SH redeem script
+  parameters:
+    - name: script
+
+- name: disconnectNode
+  description: Disconnect from the specified node
+  parameters:
+    - name: host
+
+- name: dumpPrivKey
+  description: Get the wallet-import-format (WIP) private key corresponding to an address
+  parameters:
+    - name: address
+
+- name: dumpWallet
+  description: Dumps all wallet keys in a human-readable format.
+  parameters:
+    - name: destination
+      type: string
+      description: Filesystem path to which to write the key file
+
+- name: encryptWallet
+  description: Encrypt the wallet with a passphrase
+  parameters:
+    - name: passphrase
+      type: string
+
+- name: estimateFee
+  description: Estimate the transaction fee per kilobyte for inclusion within the specified number of blocks
+  parameters:
+    - name: nBlocks
+      description: Maximum number of blocks a transaction should have to wait before getting into a block
+      type: number
+
+- name: estimatePriority
+  description: Estimate the priority (coin age) that a transaction needs in order to be included within the specified number of blocks as a free high-priority transaction
+
+- name: fundRawTransaction
+  description: Add inputs to a transaction until it has enough in value to meet its out value
+  parameters:
+    - name: transaction
+
+    - name: options
+      description: Additional options
+      type: object
+
+- name: generate
+  description: Generates blocks
+  parameters:
+    - name: nBlocks
+      description: Number of blocks to generate
+      type: number
+
+    - name: maxTries
+      description: The maximum number of iterations that are tried
+      type: number
+
+- name: generateToAddress
+  description: Mine blocks immediately to the specified address
+  parameters:
+    - name: nBlocks
+      description: The number of blocks to generate
+      type: number
+
+    - name: address
+
+    - name: maxTries
+      description: The maximum number of iterations to create the specified number of blocks
+      type: number
+
+- name: getAccount
+  description: Get the account associated with the specified address
+  parameters:
+    - name: address
+
+- name: getAccountAddress
+  description: Get the current address for receiving payments to the specified account
+  parameters:
+    - name: account
+
+- name: getAddedNodeInfo
+  description: Get information about the specified added node, or all added nodes.
+  parameters:
+    - name: verbose
+
+    - name: host
+
+- name: getAddressesByAccount
+  description: Get the list of addresses for the specified account
+  parameters:
+    - name: account
+
+- name: getBalance
+  description: Get the balance of an account or if account="*" the total across all accounts
+  parameters:
+    - name: account
+
+    - name: minConfirmations
+
+    - name: includeWatchOnly
 
 - name: getBestBlockHash
-  description: Get hash of the best (tip) block in the longest blockchain
+  description: Get header hash of the most recent block in the best blockchain
 
 - name: getBlock
   description: Get block as a JSON object or as a serialized block
   parameters:
     - name: hash
-      description: Hash of the block
-      type: hash
 
     - name: verbose
-      description: true for JSON information object, false for serialized block
-      type: boolean
-      defaultValue: false
 
 - name: getBlockChainInfo
   description: Get information about blockchain processing
@@ -41,1060 +199,534 @@
   description: Get the header hash of a block at the given height in the best blockchain
   parameters:
     - name: height
-      description: Block index (height)
-      type: integer
+
+- name: getBlockHeader
+  description: Get the block header with the specified header hash
+  parameters:
+    - name: hash
+
+    - name: verbose
+
+- name: getBlockTemplate
+  description: Get a block template or proposal for use with mining software
+  parameters:
+    - name: options
+      description: Options to use for creating the block template
+      type: object
 
 - name: getChainTips
   description: Get information about the highest-height block (tip) of each local block chain
 
+- name: getConnectionCount
+  description: Get the number of connections to other nodes
+
 - name: getDifficulty
   description: Get the current proof-of-work difficulty as a multiple of the minimum
 
-- name: getMempoolAncestors
+- name: getGenerate
+  description: Whether (true) or not (false) Bitcoin Core is currently mining
+
+- name: getHashesPerSec
+  description: Recent hashes per second performance measurement (0 if off)
+
+- name: getInfo
+  description: Get state information about the server
+
+- name: getMemoryInfo
+  description: Get information about memory usage
+
+- name: getMemPoolAncestors
   description: If txid is in the mempool, returns all in-mempool ancestors
   parameters:
     - name: txid
-      description: The transaction id (must be in mempool)
-      type: string
-    - name: verbose
-      description: True for a json object, false for array of transaction ids
-      type: boolean
 
-- name: getMempoolEntry
+    - name: verbose
+
+- name: getMemPoolDescendants
+  description: If txid is in the mempool, returns all in-mempool descendants
+  parameters:
+    - name: txid
+
+    - name: verbose
+
+- name: getMemPoolEntry
   description: Get mempool data for given transaction
   parameters:
     - name: txid
-      
 
 - name: getMemPoolInfo
   description: Get details on the active state of the transaction memory pool
 
+- name: getMiningInfo
+  description: Get mining-related information
+
+- name: getNetTotals
+  description: Get information about network traffic
+
+- name: getNetworkHashPs
+  description: Get the estimated network hashes per second based on the last n blocks at the specified height
+  parameters:
+    - name: nBlocks
+      description: Number of recent blocks to average over. Default 120. -1 for since last difficulty change.
+      type: number
+
+    - name: height
+
+- name: getNetworkInfo
+  description: Get information about P2P networking status
+
+- name: getNewAddress
+  description: Get a new Bitcoin address for receiving payments
+  parameters:
+    - name: account
+
+- name: getPeerInfo
+  description: Returns information about each connected peer
+
+- name: getRawChangeAddress
+  description: Get a new address for receiving change
+
 - name: getRawMemPool
-  description: List of transactions in the memory pool
+  description: Get list of transactions in the memory pool
   parameters:
     - name: verbose
-      description: true for details about each transaction, false for hash only
-      type: boolean
-      defaultValue: false
+
+- name: getRawTransaction
+  description: Get raw transaction data
+  parameters:
+    - name: txid
+
+    - name: verbose
+
+- name: getReceivedByAccount
+  description: Returns the total amount received to address in the account specified
+  parameters:
+    - name: account
+
+    - name: minConfirmations
+
+- name: getReceivedByAddress
+  description: Get the total amount received by the given address
+  parameters:
+    - name: address
+
+    - name: minConfirmations
+
+- name: getTransaction
+  description: Get detailed information about in-wallet transaction
+  parameters:
+    - name: txid
+
+    - name: includeWatchOnly
 
 - name: getTxOut
   description: Get details about an unspent transaction output (UTXO)
   parameters:
     - name: txid
-      description: The txid of the transaction containing the output to get, encoded as hex in RPC byte order
-      type: string
 
-    - name: outputIndex
-      type: integer
+    - name: vout
 
-    - name: doIncludeMemPool
-      description: Whether (true) or not (false) to include mempool transactions
-      exampleValue: false
+    - name: includeUnconfirmed
+      type: boolean
+      description: Set to true to include unconfirmed transactions from the memory pool
 
-    - name: bestBlock hash
-    - name: confirmations integer
-    - name: value btc
-    - name: scriptPubKey
-      type:
-        asm:
-        hex:
-        reqSigs:
-        addresses:
-    - name: version
-    - name: coinbase boolean
+- name: getTxOutProof
+  description: Get a hex-encoded proof that one or more specified transactions were included in the specified block
+  parameters:
+    - name: txids
+
+    - name: hash
 
 - name: getTxOutSetInfo
-
   description: Get details about the unspent transaction result set
 
+- name: getUnconfirmedBalance
+  description: Get the server's total unconfirmed balance
 
-    - name: height integer
-    - name: bestBlock integer
-    - name: transactions integer
-    - name: txOuts integer
-    bytes_serialized: integer
-    hash_serialized: hash
-    total_amount: btc
+- name: getWalletInfo
+  description: Get information about the wallet state
 
-- name: verifyChain
+- name: getWork
+  description: Removed in 0.10.0
 
-  description: Verifies the blockchain database
-
+- name: help
+  description: List all available RPC commands or get help for the specified RPC
   parameters:
+    - name: methodName
+      description: name of the method or omit for a list of all methods and brief usage
+      type: string
 
-    - name: checkLevel
-      description: How thorough the block verification is (0-4)
-      type: integer
-
-    - name: blocks
-      description: The number of blocks to check
-      type: integer
-
-
-
-- name: GetGenerate
-  description: Whether (true) or not (false) Bitcoin Core is currently mining
-
-
-- name: GetHashesPerSec
-  description: Recent hashes per second performance measurement (0 if off)
-
-
-- name: SetGenerate
-  description: |
-    Turn generation on or off. In regtest mode,
-    returns a list of generated block hashes.
+- name: importAddress
+  description: Adds an address or script (in hex) that can be watched
   parameters:
-    - name: doGenerate
-      type: Boolean
-      exampleValue: false
-    - name: nProcessors
-      description: Limit number of processors (-1 for unlimited)
-      defaultValue: null
-
-  nullable: true
-
-- name: GetBlockTemplate
-  description: |
-    If the request parameters include a 'mode' key, that is used to explicitly
-    select between the default 'template' request or a 'proposal'.
-    It returns data needed to construct a block to work on.
-  parameters:
-    - name: request
-      defaultValue: null
-      exampleValue: { mode: template, capabilities: [longpoll, coinbasetxn, coinbasevalue] }
-      type:
-        mode:
-          description: this must be set to template or omitted
-          type: String
-          defaultValue: template
-        capabilities:
-          description: |
-            Client side supported feature list. Choose from
-            longpoll, coinbasetxn, coinbasevalue, proposal, serverlist, workid
-          type: [ String ]
-
-    - name: version { description: The block version (1 or 2) }
-    - name: bestBlockHash { alias: previousblockhash, description: The hash of current highest block }
-    - name: transactions
-      description: |
-        Array of non-coinbase transactions
-        that should be included in the next block
-      type:
-        - data: { description: Transaction data }
-          hash: { type: LittleEndianHex, alias: id }
-          depends:
-            description: |
-              Transactions before this one (by 1-based index in 'transactions' list)
-              that must be present in the final block if this one is
-            type: [ Integer ]
-          feeSAT:
-            description: |
-              Difference in value between transaction inputs and outputs in Satoshis.
-              For coinbase transactions, this is a negative number of the total collected
-              block fees not including the block subsidy. If key is not present, fee
-              is unknown and clients must not assume there isn't one
-          nSignatureOperations:
-            defaultValue: null
-            description: |
-              Total number of signature operations, as counted for purposes of block limits.
-              If null, count is unknown and clients must not assume there aren't any.
-              Every CHECKSIG-like script op increases the number of signature operations (sigops) by a certain amount. So:
-                A standard transaction has one or two sigops
-                A sendmany transaction has one for each recipient (+1)
-                A transaction using multisig counts as 20 per "multisig arrangement"
-                  unless you're using P2SH, in which case each public key involved
-                  in the multisig counts as one sigop.
-          isRequired:
-            description: if true, this transaction must be in the final block
-            defaut: false
-    - name: coinbaseAux
-      description: data that should be included in the coinbase's scriptSig content
-      type: { flags: { type: String } }
-    - name: coinbaseValueSAT
-      description: |
-        Maximum allowable input to coinbase transaction
-        including the generation award and transaction fees (in Satoshis)
-    - name: coinbaseTxInfo { type: Object, description: Information for coinbase transaction }
-    - name: target { description: The hash target }
-    - name: minimumTime
-      alias: mintime
-      description: |
-        The minimum timestamp appropriate for next block time
-         in seconds since epoch (Jan 1 1970 GMT)
-    - name: mutable
-      type: [ String ]
-      description: List of ways the block template may be changed
-      defaultValue: [ time, transactions, prevblock ]
-    - name: nonceRange { description: A range of valid nonces }
-    - name: signatureOperationsLimit
-      alias: sigoplimit
-      description: limit of sigops in blocks
-      type: Integer
-    - name: nBytesSizeLimit { description: limit of block size }
-    - name: currentTime { alias: curtime }
-    - name: bits { type: String }
-    - name: height { description: The height of the next block }
-
-- name: GetMiningInfo
-  description: Mining-related information
-
-    - name: nBlocks { description: Height of the latest block }
-    - name: nBytesCurrentBlock
-    - name: nTransactionsCurrentBlock
-    - name: difficulty
-    - name: errors
-    - name: doGenerate { description: whether generation is on (true) or off (false) }
-    - name: nProcessors
-      alias: genproclimit
-      description: limit of how many processors are being used for generation (-1 for no limit)
-    - name: hashesPerSecond { alias: hashespersec, type: Hertz }
-
-- name: GetNetworkHashPS
-  description: Returns the estimated network hashes per second based on the last n blocks.
-  parameters:
-    - name: nBlocks
-      description: Number of recent blocks to average over. -1 for since last difficulty change.
-      defaultValue: 120
-    - name: height
-      description: Block height at which you want to estimate the network speed
-      defaultValue: -1
-
-
-- name: PrioritiseTransaction
-  description: Accepts the transaction into mined blocks at a higher (or lower) priority
-  parameters:
-    - name: id
-      description: ID of the transaction you want to prioritize
-      exampleValue: 5861981a75c19a870c22057dced6017666a6eccdf1ddebd9a0f9c52ebe7ebf4f
-    - name: deltaPriority
-      description: |
-        The priority to add or subtract. The transaction selection algorithm
-        considers the tx as it would have a higher priority
-        (priority of a transaction is calculated: coinage * value_in_satoshis / txsize)
-      exampleValue: 59047619
-    - name: deltaFeeSAT
-      description: |
-        The fee value in Satoshis to add (subtract if negative).
-        The fee is not actually paid, only used in the selection algorithm.
-      exampleValue: 10000
-
-
-- name: SubmitBlock
-  description: Attempts to submit new block to network.
-  parameters:
-    - name: block
-      type: Block
-      exampleValue: 0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4adae5494dffff001d1aa4ae180101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4d04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73ffffffff0100f2052a01000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000
-
-
-- name: AddNode
-  description: |
-    Attempts add or remove a node from the addnode list.
-    Or try a connection to a node once.
-  parameters:
-    - name: address
-      description: Address of the node, gotten from GetPeerInfo for example
-      exampleValue: 1.2.3.4:56789
-    - name: command
-      description: add, remove, or onetry
-      exampleValue: onetry
-
-
-- name: GetAddedNodeInfo
-  description: |
-    Returns information about the given added node, or all added nodes.
-    Note that "onetry" addnodes are not listed here.
-  parameters:
-    - name: verbose
-      type: Boolean
-      exampleValue: true
-    - name: node
-      description: If provided, return information about only this node
-      defaultValue: null
-      type: String
-
-    - name: addedNode { description: The node address }
-    - name: isConnected { defaultValue: null }
-    - name: addresses
-      defaultValue: null
-      type:
-        address: { description: the bitcoin server host and port }
-        connectionDirection: { description: inbound or outbound, alias: connected }
-
-- name: GetConnectionCount
-  description: Returns the number of connections to other nodes.
-
-
-- name: GetNetTotals
-  description: |
-    Returns information about network traffic, including
-    bytes in, bytes out, and current time.
-
-    - name: nBytesReceived { alias: totalbytesrecv }
-    - name: nBytesSent { alias: totalbytessent }
-    - name: CpuMilliseconds { alias: timemillis }
-
-- name: GetNetworkInfo
-  description: |
-    Returns an object containing various state info regarding P2P networking.
-
-    - name: serverVersion { alias: version }
-    - name: serverSubVersion { type: String, alias: subversion }
-    - name: protocolVersion
-    - name: localServices { description: the services we offer to the network }
-    - name: timeOffsetSeconds
-    - name: nConnections
-    - name: networks
-      type:
-        protocol: { alias: name, description: ipv4, ipv6 or onion }
-        isLimited: { description: Is the network limited using -onlynet }
-        isReachable:
-        proxy: { description: The proxy that is used for this network, or empty if none }
-    - name: relayFeeRate
-      alias: relayfee
-      description: minimum relay fee for non-free transactions in btc/kb
-    - name: localAddresses
-      type:
-        address:
-        port:
-        relativeScore:
-
-- name: GetPeerInfo
-  description: Returns information about each connected peer
-
-    - name: dictionary
-      key: String
-      value:
-        id: { alias: id }
-        address: { description: The IP address and port of the peer, alias: addr }
-        localAddress: { description: Our IP address and port, alias: addrlocal }
-        services: { description: The services offered }
-        lastSendTime: { alias: lastsend, description: Unix time of the last send to this node }
-        lastReceiveTime: { alias: lastrecv, description: Unix time of the last receive from this node }
-        nBytesSent: { description: Total bytes sent }
-        nBytesReceived: { alias: bytesrecv, description: Total bytes received }
-        connectedTime: { alias: conntime, description: Unix time that we connected to this node }
-        pingTimeSeconds: { description: ping messages are processed in a queue with all others }
-        pingWaitSeconds: { description: ping measures not just network lag but also queue backlog }
-        serverVersion: { alias: version, description: The peer server version }
-        serverSubVersion: { type: String, alias: subver, description: The string server version }
-        isInbound: { alias: inbound, description: Inbound (true) or Outbound (false) }
-        startingHeight: { description: The starting height (block) of the peer }
-        banScore:
-        nSynchedHeaders:
-          alias: synched_headers
-          description: Height of last header we have in common with this peer
-        nSynchedBlocks:
-          alias: synched_blocks
-          description: Height of last block we have in common with this peer
-        inFlight:
-          description: The heights of blocks we're currently asking from this peer
-
-- name: Ping
-  description: |
-    Requests that a ping be sent to all other nodes to measure ping time. The ping
-    command is handled in queue with all other commands, so it measures processing
-    backlog, not just network ping.
-
-
-- name: CreateRawTransaction
-  description: |
-    Create a transaction spending the given inputs and sending to the given addresses.
-    Returns hex-encoded raw transaction. Note that the transaction's inputs are not signed,
-    and it is not stored in the wallet or transmitted to the network.
-  parameters:
-    - name: inputs
-      type:
-        - txId:
-          outputIndex:
-      exampleValue:
-        - txId: 5861981a75c19a870c22057dced6017666a6eccdf1ddebd9a0f9c52ebe7ebf4f
-          outputIndex: 1
-    - name: outputs
-      type: Object
-      description: Object of address:valueBTC pairs
-      exampleValue:
-        n2pp3K5ygHdiVrMcaMuFw6i1PheacRJv7d: 1.1
-
-
-- name: DecodeRawTransaction
-  description: Parses the serialized transaction provided and returns an object
-  parameters:
-    - name: transaction
-      type: Buffer
-      exampleValue: 0100000001ca408f2678979ac5ee9dc11efdfe7529dedb5a8e18ab9ef302e059dc316b8949010000006a47304402205a31f60debc5e0e7fce7d910d6e3e94c1f5e134b96b07325259521e09b7119b4022019148311091760ce1dcae4287258af720e57be7e5cb843e9ceb9fcaff2ec9efd012102662111ebeac6d8e34c91d455c39e2c14ad008d69747e2a5433cbd00301b10f54ffff00ff022ade0b00000000001976a914a11b66a67b3ff69671c8f82254099faf374b800e88ac1625c900000000001976a91455d3ca5893ffbda81c8a4bec864fb1225c1b655788ac00000001
-
-    - name: txId
-    - name: version
-    - name: lockTime
-    - name: inputs
-      alias: vin
-      description: Array of the inputs to the transaction
-      type:
-        - prevTxId: { alias: txid }
-          outputIndex: { alias: vout }
-          scriptSig:
-            type:
-              opCodes: { alias: asm }
-              hex:
-          sequence:
-    - name: outputs
-      alias: vout
-      type:
-        valueBTC:
-        outputIndex: { alias: n }
-        scriptPubKey:
-          type:
-            asm:
-            hex:
-            nRequiredSignatures: { alias: reqSigs }
-            transactionType: { alias: type, type: String }
-            addresses:
-              type: [ BitcoinAddress ]
-
-- name: DecodeScript
-  description: Decode a hex-encoded script.
-  parameters:
-    - name: script
-      exampleValue: 76a91455d3ca5893ffbda81c8a4bec864fb1225c1b655788ac
-
-    - name: asm
-    - name: hex
-    - name: outputType { alias: type }
-    - name: nRequiredSigs { alias: reqSigs }
-    - name: addresses
-      type: [ String ]
-    p2sh: { defaultValue: null, type: String }
-
-- name: GetRawTransaction
-  description: |
-    Return the raw transaction data.
-
-    - name: Note By design Bitcoin Core does not maintain a full transaction index.
-    Use the -txindex command line option to tell it to build a full index, which can take
-    many hours. By default, this method only returns a result if ID provided is for a
-    transaction in the mempool or if the transaction contains an unspent output.
-
-    If verbose=0, returns a buffer that is serialized, hex-encoded data for 'txId'.
-    If verbose is non-zero, returns an Object with information about 'txId'.
-  parameters:
-    - name: txId
-      type: Buffer
-      exampleValue: 75c0765c97805ff6bc7e383d5b927620cf39afa87f061784e94aa092c10c9b57
-    - name: verbose
-      type: Integer
-      defaultValue: 0
-
-
-
-- name: SendRawTransaction
-  description: |
-    Submits a serialized transaction to local node and network.
-    Also see CreateRawTransaction and SignRawTransaction calls.
-  parameters:
-    - name: tx
-      type: Buffer
-      exampleValue: 0100000001ca408f2678979ac5ee9dc11efdfe7529dedb5a8e18ab9ef302e059dc316b8949010000006a47304402205a31f60debc5e0e7fce7d910d6e3e94c1f5e134b96b07325259521e09b7119b4022019148311091760ce1dcae4287258af720e57be7e5cb843e9ceb9fcaff2ec9efd012102662111ebeac6d8e34c91d455c39e2c14ad008d69747e2a5433cbd00301b10f54ffff00ff022ade0b00000000001976a914a11b66a67b3ff69671c8f82254099faf374b800e88ac1625c900000000001976a91455d3ca5893ffbda81c8a4bec864fb1225c1b655788ac00000001
-    - name: allowHighFees
-      type: Boolean
-      defaultValue: false
-
-
-- name: SignRawTransaction
-  description: |
-    Sign inputs for raw transaction (serialized, hex-encoded).
-    The second optional argument (may be null) is an array of previous transaction outputs that
-    this transaction depends on but may not yet be in the blockchain.
-    The third optional argument (may be null) is an array of base58-encoded private
-    keys that, if given, will be the only keys used to sign the transaction.
-  parameters:
-    - name: transaction
-      exampleValue: 0100000001ca408f2678979ac5ee9dc11efdfe7529dedb5a8e18ab9ef302e059dc316b8949010000006a47304402205a31f60debc5e0e7fce7d910d6e3e94c1f5e134b96b07325259521e09b7119b4022019148311091760ce1dcae4287258af720e57be7e5cb843e9ceb9fcaff2ec9efd012102662111ebeac6d8e34c91d455c39e2c14ad008d69747e2a5433cbd00301b10f54ffff00ff022ade0b00000000001976a914a11b66a67b3ff69671c8f82254099faf374b800e88ac1625c900000000001976a91455d3ca5893ffbda81c8a4bec864fb1225c1b655788ac00000001
-    - name: prevTxs
-      description: An json array of previous dependent transaction outputs
-      type:
-        - txId:
-          outputIndex: { alias: vout }
-          scriptPubKey: { alias: scriptPubKey }
-          redeemScript: { alias: redeemScript, type: Hex }
-      defaultValue: null
-    - name: privateKeys
-      description: Array base58-encoded private keys for signing
-      type: [ String ]
-      defaultValue: null
-    - name: sigHashType
-      description: |
-        The signature hash type. Must be one of
-           ALL
-           NONE
-           SINGLE
-           ALL|ANYONECANPAY
-           NONE|ANYONECANPAY
-           SINGLE|ANYONECANPAY
-        Default is ALL
-      type: String
-      defaultValue: null
-
-- name: AddMultiSigAddress
-  description: |
-    Add a multisignature address to the wallet.
-    Returns a bitcoin address associated with the keys provided.
-  parameters:
-    - name: nRequired
-      description: The number of required signatures out of the n keys or addresses
-      exampleValue: 2
-    - name: keys
-      description: Array of bitcoin addresses / hex-encoded public keys
-      exampleValue:
-        - 16sSauSf5pF2UkUwvKGq4qjNRzBZYqgEL5
-        - 171sgjn4YtPu27adkKGrdDwzRTxnRkBfKV
-    - name: account
-      description: Account to assign the address (null means default account)
-      defaultValue: null
-
-
-- name: BackupWallet
-  parameters:
-    - name: destination
-      type: Path
-      description: Can be a directory or a path with filename
-      exampleValue: /dev/null
-
-  description: Safely copies wallet.dat to destination
-
-- name: DumpPrivKey
-  description: |
-    Reveals the private key corresponding to BitcoinAddress
-    See also ImportPrivKey, which can be used with this output
-  parameters:
-    - name: bitcoinAddress
-      exampleValue: 1234
-
-
-- name: DumpWallet
-  description: Dumps all wallet keys in a human-readable format.
-  parameters:
-    - name: filename
-      exampleValue: /dev/null
-
-
-- name: EncryptWallet
-  description: |
-    Encrypts the wallet with 'passphrase'. This is for first time encryption.
-    After this, any calls that interact with private keys such as sending or signing
-    will require the passphrase to be set prior the making these calls.
-    Use the WalletPassphrase call for this, and then WalletLock call.
-    If the wallet is already encrypted, use the WalletPassphraseChange call.
-    Note that this will shutdown the server.
-  parameters:
-    - name: passphrase
-      description: |
-        The pass phrase to encrypt the wallet with.
-        It must be at least 1 character, but should be long.
-      exampleValue: foo123
-
-
-- name: GetAccount
-  description: Returns the account associated with the given address.
-  parameters:
-    - name: BitcoinAddress
-      description: The bitcoin address for account lookup
-      exampleValue: 1D1ZrZNe3JUo7ZycKEYQQiQAWd9y54F4XZ
-
-
-- name: GetAccountAddress
-  description: Returns the current Bitcoin address for receiving payments to this account.
-  parameters:
-    - name: account
-      description: |
-        The account name for the address. It can also be set to the empty string
-        to represent the default account. The account does not need to exist.
-        It and a new address will be created if there's no account with the given name.
-      defaultValue: ""
-
-
-- name: GetAddressesByAccount
-  parameters:
-    - name: account
-      exampleValue: test
-      defaultValue: ""
-  description: Returns the list of addresses for the given account.
-
-
-- name: GetBalance
-  parameters:
-    - name: account
-      description: Use * for the entire wallet. It may be the default account using ""
-      defaultValue: ""
-    - name: minconf
-      defaultValue: 1
-      description: Only include transactions confirmed at least this many times.
-    - name: doIncludeWatchOnly
-      description: If true, include balance in WatchOnly addresses (see ImportAddress)
-      defaultValue: false
-  description: |
-    If account is not specified, returns the server's total available balance.
-    If account is specified, returns the balance in the account.
-    Note that the account  is not the same as leaving the parameter out.
-    The server total may be different to the balance in the default  account.
-
-
-- name: GetNewAddress
-  description: |
-    Returns a new Bitcoin address for receiving payments.
-    If account is specified (recommended), it is added to the address book,
-    so payments received with the address will be credited to that account.
-  parameters:
-    - name: account
-      defaultValue: null
-      description: |
-        The account name for the address to be linked to. If not provided,
-        the default account is used. It can also be set to the empty string to
-        represent the default account. The account does not need to exist. It
-        will be created if there is no account by the given name.
-
-
-- name: GetRawChangeAddress
-  description: |
-    Returns a new Bitcoin address, for receiving change.
-    This is for use with raw transactions, NOT normal use.
-
-
-- name: GetReceivedByAccount
-  parameters:
-    - name: account
-      defaultValue: ""
-    - name: minconf
-      defaultValue: 1
-  description: Returns the total amount received to address in the account specified
-
-
-- name: GetReceivedByAddress
-  parameters:
-    - name: BitcoinAddress
-      exampleValue: mkRLiFtiEzuqaC7hDUNMwTniMTUhq9xpK7
-    - name: nConfirmations
-      description: Minimum number of confirmations required
-      defaultValue: 1
-  description: Returns the total amount received by the given BitcoinAddress
-
-
-- name: GetTransaction
-  description: Get detailed information about in-wallet transaction
-  parameters:
-    - name: txId
-      exampleValue: 7d8989613ee46f4961867a329b772159e78ad4f454b1fb40c5293ed4cc074493
-    - name: doIncludeWatchOnly
-      defaultValue: false
-      description: Whether to include watchonly addresses in balance calculation and details
-
-    - name: amountBTC
-    - name: nConfirmations
-    - name: blockHash
-    - name: blockHeight
-    - name: blockTime
-    - name: txId
-    - name: time
-    - name: receivedTime { alias: timereceived }
-    - name: details
-      type:
-        - account:
-          address:
-          category: { description: send or receive }
-          amountBTC:
-          outputIndex: { alias: vout }
-    - name: hex
-
-- name: GetUnconfirmedBalance
-  description: Returns the server's total unconfirmed balance
-
-
-- name: GetWalletInfo
-  description: Returns an object containing various wallet state info.
-
-    - name: walletVersion
-    - name: balanceBTC
-    - name: nTransaction { alias: txcount, description: total number of transactions in the wallet }
-    - name: oldestKeyTime
-      description: the timestamp of the oldest pre-generated key in the key pool
-    - name: nKeys { description: Number of keys pre-generated in the key pool }
-    - name: unlockedUntilTime
-      alias: unlocked_until
-      description: |
-        Time until which the wallet is unlocked for transfers,
-        or 0 if the wallet is locked.
-
-- name: ImportAddress
-  description: |
-    Adds an address or script (in hex) that can be watched
-    as if it were in your wallet but cannot be used to spend.
-    - name: Note This call can take minutes to complete if rescan is true.
-  parameters:
-    - name: address
+    - name: addressOrScript
       description: Bitcoin address or script
-      exampleValue: mkRLiFtiEzuqaC7hDUNMwTniMTUhq9xpK7
-    - name: label
-      defaultValue: ""
-    - name: doRescan
-      defaultValue: true
-      exampleValue: false
-      description: Rescan the wallet for transactions corresponding to the address provided
+      type: string
 
-- name: ImportPrivKey
-  description: |
-    Adds a private key (as returned by DumpPrivKey) to your wallet.
-    - name: Note This call can take minutes to complete if rescan is true.
+    - name: account
+
+    - name: rescan
+
+- name: importMulti
+  description: Import addresses or scripts (with private keys, public keys, or P2SH redeem scripts)
   parameters:
-    - name: privateKey
-      description: The private key (see DumpPrivKey)
-      exampleValue: cNttY6Aty9myMAfNacxrvbW4KQNff6mt279LkNWDQUPWdYsycwW8
-    - name: label
-      defaultValue: null
-      description: An optional label
-      exampleValue: test
-    - name: doRescan
-      defaultValue: null
-      description: Rescan the wallet for transactions (null is same as true)
-      exampleValue: false
+    - name: imports
+      description: Array of objects to be imported
+      type: array
+      itemType: object
 
+    - name: options
+      description: Options regarding the import
+      type: object
 
-- name: ImportWallet
-  description: Imports keys from a wallet dump file (see DumpWallet).
+- name: importPrivKey
+  description: Add a private key (as returned by dumpPrivKey) to your wallet.
+  parameters:
+    - name: key
+
+    - name: account
+
+    - name: rescan
+
+- name: importPrunedFunds
+  description: Import funds without the need of a rescan for use with pruned wallets
+  parameters:
+    - name: transaction
+
+    - name: txOutProof
+
+- name: importWallet
+  description: Import keys from a wallet dump file (see DumpWallet).
   parameters:
     - name: filename
-      description: The wallet file
-      exampleValue: test
+      description: Relative path of the wallet file
+      type: string
 
-- name: KeyPoolRefill
-  description: Fills the keypool
+- name: keyPoolRefill
+  description: Fill the cache of unused pre-generated keys (the key pool)
   parameters:
-    - name: newsize
-      type: Integer
-      defaultValue: 100
-      description: The new keypool size
+    - name: newSize
+      type: number
+      description: The new size of the key pool
 
-
-- name: ListAccounts
-  description: Returns Object that has account names as keys, account balances as values.
+- name: listAccounts
+  description: List accounts and their balances
   parameters:
-    - name: minconf
-      description: Only include transactions with at least this many confirmations
-      defaultValue: 1
-    - name: doIncludeWatchonly
-      description: Include balances in watchonly addresses (see ImportAddress)
-      defaultValue: false
+    - name: minConfirmations
 
+    - name: includeWatchOnly
 
-- name: ListAddressGroupings
-  description: |
-    Lists groups of addresses which have had their common ownership
-    made public by common use as inputs or as the resulting change
-    in past transactions
-      [
-        bitcoinaddress,     (string) The bitcoin address
-        amount,                 (numeric) The amount in btc
-        account             (string, optional) The account
-      ]
+- name: listAddressGroupings
+  description: Lists groups of addresses which have had their common ownership made public
 
+- name: listBanned
+  description: List all banned IPs/Subnets
 
-- name: ListLockUnspent
-  description: |
-    Returns list of temporarily unspendable outputs.
-    See the lockunspent call to lock and unlock transactions for spending.
+- name: listLockUnspent
+  description: Get a list of temporarily unspendable (locked) outputs.
 
-    - txId: { description: The transaction id locked }
-      outputIndex: { alias: vout, description: The vout value }
-
-- name: ListReceivedByAccount
+- name: listReceivedByAccount
   description: List balances by account
   parameters:
-    - name: minconf
-      defaultValue: 1
-      description: The minimum number of confirmations before payments are included.
-    - name: doIncludeEmpty
-      defaultValue: false
-      description: Whether to include accounts that haven't received any payments.
-    - name: doIncludeWatchOnly
-      defaultValue: false
-      description: Whether to include WatchOnly addresses (see ImportAddress)
+    - name: minConfirmations
 
-    - involvesWatchOnly:
-        description: only returned if imported addresses were involved in transaction
-        defaultValue: true
-      account:
-        description: The account name of the receiving account
-      amountBTC:
-        description: The total amount received by addresses with this account
-      nConfirmations:
-        description: The number of confirmations of the most recent transaction included
+    - name: includeEmpty
 
-- name: ListReceivedByAddress
+    - name: includeWatchOnly
+
+- name: listReceivedByAddress
   description: List balances by receiving address
   parameters:
-    - name: minconf
-      description: The minimum number of confirmations before payments are included
-      defaultValue: 1
-    - name: doIncludeEmpty
-      defaultValue: false
-      description: Whether to include addresses that haven't received any payments
-    - name: doIncludeWatchOnly
-      description: Whether to include watchonly addresses (see ImportAddress)
-      defaultValue: false
+    - name: minConfirmations
 
-    - involvesWatchOnly:
-        description: only returned if imported addresses were involved in transaction
-        defaultValue: true
-      account:
-        description: The account name of the receiving account
-      amountBTC:
-        description: The total amount received by addresses with this account
-      nConfirmations:
-        description: The number of confirmations of the most recent transaction included
+    - name: includeEmpty
 
-- name: ListSinceBlock
+    - name: includeWatchOnly
+
+- name: listSinceBlock
   description: Get all transactions in blocks since block blockHash
   parameters:
-    - name: blockHash
-      description: The block hash to list transactions since (null means since genesis)
-      defaultValue: null
-    - name: nConfirmations
-      description: Must be 1 or more
-      defaultValue: 1
-    - name: doIncludeWatchOnly
-      description: If true, include transactions to WatchOnly addresses
-      defaultValue: false
+    - name: hash
 
-    - name: transactions
-      - account:
-        address:
-          description: |
-            The bitcoin address of the transaction.
-            Not present for move transactions (category = move).
-        category:
-          description: send (negative amounts) or receive (positive amounts)
-        amountBTC:
-          description: |
-            The amount in bitcoins. This is negative for the 'send' category,
-            and for the 'move' category for moves outbound. It is positive for
-            the 'receive' category, and for the 'move' category for inbound funds.
-        outputIndex:
-        feeBTC:
-          defaultValue: null
-          description: negative and only available for the 'send' category of transactions.
-        nConfirmations:
-          description: |
-            The number of confirmations for the transaction.
-            Available for 'send' and 'receive' category of transactions.
-        blockHash:
-        blockIndex:
-        blockTime:
-        txId:
-        time:
-        receivedTime:
-        comment:
-        to:
-    - name: lastblock lastblockhash     (string) The hash of the last block
+    - name: minConfirmations
 
-- name: ListTransactions
-  description: |
-    Returns up to 'count' most recent transactions skipping
-    the first 'from' transactions for account 'account'.
+    - name: includeWatchOnly
+
+- name: listTransactions
+  description: Get the most recent transactions that affect the wallet
   parameters:
     - name: account
-      description: The account name. If null, all accounts.
-      defaultValue: null
+
     - name: count
       description: The number of transactions to return
-      defaultValue: 10
-    - name: from
+      type: number
+
+    - name: skip
       description: The number of transactions to skip
-      defaultValue: 0
-    - name: IncludeWatchOnly
-      description: Include transactions to watchonly addresses (see ImportAddress)
-      defaultValue: false
+      type: number
 
-  todo:
-    - name: account accountname The account name associated with the transaction. It will be  for the default account.
-    - name: address bitcoinaddress The bitcoin address of the transaction. Not present for  move transactions (category = move).
-    - name: category send|receive|move, (string) The transaction category. 'move' is a local (off blockchain) transaction between accounts, and not associated with an address, transaction id or block. 'send' and 'receive' transactions are associated with an address, transaction id and block details
-    - name: amount The amount in btc. This is negative for the 'send' category, and for the 'move' category for moves outbound. It is positive for the 'receive' category, and for the 'move' category for inbound funds.
-    - name: vout the vout value
-    - name: fee The amount of the fee in btc. This is negative and only available for the  send' category of transactions.
-    - name: confirmations the number of confirmations for the transaction.
-    - name: blockhash block hash containing the transaction.
-    - name: blockindex The block index containing the transaction.
-    - name: txid transaction id.
-    - name: time
-    - name: timereceived
-    - name: comment
-    - name: otheraccount |
-      For the 'move' category of transactions, the account
-      the funds came from (for receiving funds, positive amounts),
-      or went to (for sending funds, negative amounts).
+    - name: includeWatchOnly
 
-- name: ListUnspent
-  description: |
-    Returns array of unspent transaction outputs
-    with between minconf and maxconf (inclusive) confirmations.
-    Optionally filter to only include txouts paid to specified addresses.
-    Results are an array of Objects, each of which has:
-    {txid, vout, scriptPubKey, amount, confirmations}
+- name: listUnspent
+  description: Get an array of unspent transaction outputs belonging to this wallet
   parameters:
-    - name: minconf
-      defaultValue: 1
-    - name: maxconf
-      defaultValue: 9999999
+    - name: minConfirmations
+
+    - name: maxConfirmations
       description: The maximum confirmations to filter
+      type: number
+
     - name: addresses
-      description: Array of bitcoin addresses to filter
-      defaultValue: []
-      type: [ BitcoinAddress ]
 
-    - txId:
-      outputIndex:
-      BitcoinAddress:
-      account:
-      scriptPubKey:
-      amountBTC:
-      nConfirmations:
-
-- name: LockUnspent
-  description: |
-
-    Updates list of temporarily unspendable outputs.
-
-    Returns whether the command was successful or not.
-
-    Temporarily lock (unlock=false) or unlock (unlock=true) specified outputs.
-    A locked transaction output will not be chosen by automatic coin selection.
-    Locks are stored in memory only. Nodes start with zero locked outputs, and
-    the locked output list is always cleared (by virtue of process exit) when a
-    node stops or fails. Also see the ListUnspent call
-
+- name: lockUnspent
+  description: Temporarily lock or unlock specified transaction outputs
   parameters:
-    - name: doUnlock
+    - name: unlock
       description: Whether to unlock (true) or lock (false) the specified transactions
-      exampleValue: true
-    - name: transactions
-      description: Array of objects
-      type:
-        - txId:
-          outputIndex:
-      exampleValue: []
-#          - txId: 7d8989613ee46f4961867a329b772159e78ad4f454b1fb40c5293ed4cc074493
-#            outputIndex: 0
+      type: boolean
 
+    - name: outputs
+      description: Array of outputs to lock or unlock
+      type: array
+      itemType: object
 
-- name: Move
-  description: |
-    Move a specified amount from one account in your wallet to another.
-    Returns true if successful.
+- name: move
+  description: Move a specified amount from one account to another using an off-block-chain transaction
   parameters:
     - name: fromAccount
       description: The name of the account to move funds from
-      exampleValue: ""
+      type: string
+
     - name: toAccount
       description: The name of the account to move funds to
-      exampleValue: test
-    - name: minconf
-      description: Only use funds with at least this many confirmations.
-      defaultValue: 1
+      type: string
+
+    - name: amount
+
+    - name: unused
+      description: This parameter is not used. If provided, can be any integer
+      type: number
+
     - name: comment
-      description: An optional comment, stored in the wallet only.
-      defaultValue: ""
 
+- name: ping
+  description: Request that a ping be sent to all connected nodes to measure ping time
 
-- name: SendFrom
-  description: |
-    Sent an amount from an account to a bitcoin address.
-    The amount is a real and is rounded to the nearest 0.00000001.
+- name: preciousBlock
+  description: Treat a block as if it were received before others with the same work
   parameters:
-    - name: fromAccount
-      description: The name of the account to send funds from. "" means default account
-      exampleValue: ""
-    - name: toBitcoinAddress
-      description: The bitcoin address to send funds to.
-      exampleValue: mkRLiFtiEzuqaC7hDUNMwTniMTUhq9xpK7
-    - name: amountBTC
-      description: Transaction fee is added on top
-      exampleValue: 0.1
-    - name: minconf
-      defaultValue: 1
-      description: Only use funds with at least this many confirmations.
-    - name: comment
-      description: |
-        A comment used to store what the transaction is for.
-        This is not part of the transaction, just kept in your wallet.
-      defaultValue: ""
-    - name: commentTo
-      description: |
-        A comment to store the name of the recipient.
-        This is not part of the transaction, just kept in your wallet.
-      defaultValue: ""
+    - name: hash
 
-
-- name: SendMany
-  description: |
-    Send multiple times. Amounts are double-precision floating point numbers.
-    Returns the transaction id for the send. Only 1 transaction is created
-    regardless of the number of addresses.
+- name: prioritiseTransaction
+  description: Prioritise a transaction by adding virutal priority or fee
   parameters:
-    - name: fromAccount
-      description: Empty string means the default account
-      exampleValue: ""
-    - name: amounts
-      type: Object
-      description: An object with address:amountBTC as the key:value pairs
-      exampleValue: { mjUq15ga1EwCXJUHs2QiYhhrxTansS3Rc7: 0.01 }
-    - name: minconf
-      defaultValue: 1
-      description: Only use the balance confirmed at least this many times.
-    - name: comment
-      defaultValue: ""
+    - name: txid
 
+    - name: priority
+      description: The priority to add or subtract
+      type: number
 
-- name: SendToAddress
-  description: |
-    Send an amount to a given address. The amount is interpreted as a
-    floating point number (real) and is rounded to the nearest 0.00000001
+    - name: fee
+      description: The fee to add or subtract in satoshis
+      type: number
+
+- name: pruneBlockChain
+  description: Prune the block chain up to a specified height or timestamp
   parameters:
-    - name: BitcoinAddress
-      exampleValue: mkRLiFtiEzuqaC7hDUNMwTniMTUhq9xpK7
-    - name: amountBTC
-      exampleValue: 0.1
-    - name: comment
-      defaultValue: ""
-    - name: commentTo
-      defaultValue: ""
+    - name: heightOrTimestamp
+      description: The block height or Unix timestamp to prune up to
+      type: number
 
-
-- name: SetAccount
-  description: Sets the account associated with the given address
+- name: removePrunedFunds
+  description: Delete the specified transaction from the wallet
   parameters:
-    - name: bitcoinAddress
-      description: The bitcoin address to be associated with an account
-      exampleValue: mjUq15ga1EwCXJUHs2QiYhhrxTansS3Rc7
+    - name: txid
+
+- name: sendFrom
+  description: Spend an amount from a local account to a bitcoin address
+  parameters:
     - name: account
-      description: The account to assign the address to
-      exampleValue: ""
 
-- name: SetTxFee
-  description: |
-    Set the transaction fee, BTC per kB, nearest 0.00000001
-    Returns true if successful
+    - name: address
+
+    - name: amount
+
+    - name: minConfirmations
+      description: Only use funds with at least this many confirmations
+      type: number
+
+    - name: comment
+
+    - name: commentTo
+      description: A comment to store the name of the recipient
+      type: string
+
+- name: sendMany
+  description: Create and broadcast a transaction that sends outputs to multiple addresses
   parameters:
-    - name: feeRate
-      exampleValue: 0.00001
+    - name: account
 
+    - name: outputs
+      description: "An object of shape { address1: amount1, ... }"
+      type: object
 
-- name: SignMessage
-  description: Sign a message with the private key of an address
+    - name: minConfirmations
+
+    - name: comment
+
+- name: sendRawTransaction
+  description: Submit a serialized transaction to local node and network
   parameters:
-    - name: BitcoinAddress
-      description: The bitcoin address to use for the private key.
-      exampleValue: mjUq15ga1EwCXJUHs2QiYhhrxTansS3Rc7
+    - name: transaction
+
+    - name: allowHighFees
+      description: true to allow an abnormally high transaction fee, otherwise false (the default)
+      type: boolean
+
+- name: sendToAddress
+  description: Spend an amount to the given address
+  parameters:
+    - name: address
+
+    - name: amount
+
+    - name: comment
+
+    - name: commentTo
+      description: A comment to store the name of the recipient
+      type: string
+
+- name: setAccount
+  description: Put the specified address into the specified account
+  parameters:
+    - name: address
+
+    - name: account
+
+- name: setBan
+  description: Add or remove a IP/Subnet from the banned list
+  parameters:
+    - name: host
+
+    - name: command
+      description: add or remove
+      type: string
+
+- name: setGenerate
+  description: Turn generation on or off
+  parameters:
+    - name: value
+      description: Whether to turn generation on (true) or off (false)
+      type: boolean
+
+    - name: nProcessors
+      description: Limit number of processors (-1 for unlimited)
+      type: number
+
+- name: setNetworkActive
+  description: Disable or enable all P2P network activity
+  parameters:
+    - name: value
+      description: Whether activity is enabled (true) or disabled (false)
+      type: boolean
+
+- name: setTxFee
+  description: Set the transaction fee rate
+  parameters:
+    - name: value
+      description: New value of fee rate in amount per kB
+      type: number
+
+- name: signMessage
+  description: Sign a message with the private key of the specified address
+  parameters:
+    - name: address
+
     - name: message
-      description: The message to create a signature of
-      exampleValue: Hello world!
+      description: The message to sign
+      type: string
 
+- name: signMessageWithPrivKey
+  description: Sign a message with the specified private key
+  parameters:
+    - name: key
+
+    - name: message
+      description: The message to sign
+      type: string
+
+- name: signRawTransaction
+  description: Sign a transaction using a wallet key or the one provided
+  parameters:
+    - name: transaction
+
+    - name: dependencies
+      description: The previous outputs being spent by this transaction
+      type: object
+
+    - name: keys
+
+    - name: sigHashType
+      description: One of ALL, NONE, SINGLE, ALL|ANYONECANPAY, NONE|ANYONECANPAY, or SINGLE|ANYONECANPAY
+      type: string
+
+- name: stop
+  description: Safely shut down the Bitcoin server
+
+- name: submitBlock
+  description: Attempts to submit new block to network.
+  parameters:
+    - name: block
+
+- name: validateAddress
+  description: Get information about the specified address
+  parameters:
+    - name: address
+
+- name: verifyChain
+  description: Verifies the blockchain database
+  parameters:
+    - name: level
+      description: How thorough the block verification is (0-4)
+      type: number
+
+    - name: nBlocks
+      description: The number of blocks to check (0 for all)
+      type: number
+
+- name: verifyMessage
+  description: Verify a signed message
+  parameters:
+    - name: address
+
+    - name: signature
+      description: The signature created by the signer
+      type: string
+
+    - name: message
+
+- name: verifyTxOutProof
+  description: Verify that a proof points to one or more transactions in a block
+  parameters:
+    - name: txOutProof
+
+- name: walletLock
+  description: Remove the wallet encryption key from memory, locking the wallet
+
+- name: walletPassphrase
+  description: Store the wallet decryption key in memory for the specified number of seconds
+  parameters:
+    - name: passphrase
+
+    - name: duration
+      description: The number of seconds after which the secret will be deleted from memory
+      type: number
+
+- name: walletPassphraseChange
+  description: Change the wallet passphrase
+  parameters:
+    - name: passphrase
+
+    - name: newPassphrase
+      description: The new passphrase
+      type: string

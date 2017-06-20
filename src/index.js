@@ -1,11 +1,9 @@
 'use strict';
 
 const path = require('path')
-const {readFileSync} = require('fs');
 
 const axios = require('axios')
 const ini = require('ini')
-const {safeLoad} = require('js-yaml');
 const uuid = require('uuid/v4')
 
 const {readFile} = require('@carnesen/node-util')
@@ -17,7 +15,7 @@ const {
   isEmptyObject,
 } = require('@carnesen/util')
 
-const methods = safeLoad(readFileSync(path.join(__dirname, 'methods.yml')))
+const methods = require('./methods')
 
 function clientFactory (options = {}) {
   assertNonEmptyObject(options, 'options')
