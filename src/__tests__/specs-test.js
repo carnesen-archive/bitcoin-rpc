@@ -7,7 +7,7 @@ const {
   isDefined,
 } = require('@carnesen/util')
 
-const methods = require('../methods')
+const specs = require('../specs')
 
 const TYPES = ['string', 'number', 'boolean', 'array', 'object']
 
@@ -23,21 +23,21 @@ function assertParameter (parameter) {
   }
 }
 
-function assertMethod (method) {
-  it(`${method.name} has the right properties`, function () {
-    assertNonEmptyObject(method)
-    assertCamelCasedString(method.name, 'name')
-    assertNonEmptyString(method.description, 'description')
-    if (isDefined(method.parameters)) {
-      assertArray(method.parameters)
-      method.parameters.forEach(assertParameter)
+function assertSpec (spec) {
+  it(`${spec.name} has the right properties`, function () {
+    assertNonEmptyObject(spec)
+    assertCamelCasedString(spec.name, 'name')
+    assertNonEmptyString(spec.description, 'description')
+    if (isDefined(spec.parameters)) {
+      assertArray(spec.parameters)
+      spec.parameters.forEach(assertParameter)
     }
   })
 }
 
 describe(__filename, function () {
-  it('methods is an array', function () {
-    assertArray(methods)
+  it('specs is an array', function () {
+    assertArray(specs)
   })
-  methods.forEach(assertMethod)
+  specs.forEach(assertSpec)
 })

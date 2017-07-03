@@ -8,7 +8,7 @@
 - name: addMultiSigAddress
   description: Add a multisignature address to the wallet, returning an address associated with the keys provided
   parameters:
-    - name: nRequired
+    - name: m
       description: The number (m) of required signatures out of the n keys or addresses
       type: number
 
@@ -55,7 +55,7 @@
 - name: createMultiSig
   description: Create a P2SH multi-signature address
   parameters:
-    - name: nRequired
+    - name: m
       description: Minimum number (m) of signatures required to spend this m-of-n multisig script
       type: number
 

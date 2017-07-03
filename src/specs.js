@@ -5,11 +5,11 @@ const {readFileSync} = require('fs');
 
 const {safeLoad} = require('js-yaml');
 
-const methods = safeLoad(readFileSync(path.join(__dirname, 'methods.yml')))
+const specs = safeLoad(readFileSync(path.join(__dirname, 'specs.yml')))
 
-methods.forEach(function (method) {
-  method.parameters = method.parameters || []
-  method.parameters.forEach(function (parameter) {
+specs.forEach(function (spec) {
+  spec.parameters = spec.parameters || []
+  spec.parameters.forEach(function (parameter) {
     switch (parameter.name) {
       case 'account':
         parameter.description = 'A wallet account label ("" means the default account)'
@@ -114,4 +114,4 @@ methods.forEach(function (method) {
   })
 })
 
-module.exports = methods
+module.exports = specs
