@@ -1,0 +1,3 @@
+{
+  "extends": "@carnesen/tslint-config/nodejs/tslint.json"
+}

@@ -1,0 +1,11 @@
+{
+  "extends": "./node_modules/@carnesen/tsconfig/nodejs/tsconfig.json",
+  "include": [
+    "src"
+  ],
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./lib",
+    "preserveConstEnums": true
+  },
+}
