@@ -1,0 +1,51 @@
+{
+  "chain": "test",
+  "blocks": 1444069,
+  "headers": 1444069,
+  "bestblockhash": "00000000000819848d69033f44dd41feb071c298780cb9666f8fd96c164f48ec",
+  "difficulty": 1,
+  "mediantime": 1542617709,
+  "verificationprogress": 0.9999996613635136,
+  "initialblockdownload": false,
+  "chainwork": "0000000000000000000000000000000000000000000000d34591cff0423c9c0b",
+  "size_on_disk": 22922143432,
+  "pruned": false,
+  "softforks": [
+    {
+      "id": "bip34",
+      "version": 2,
+      "reject": {
+        "status": true
+      }
+    },
+    {
+      "id": "bip66",
+      "version": 3,
+      "reject": {
+        "status": true
+      }
+    },
+    {
+      "id": "bip65",
+      "version": 4,
+      "reject": {
+        "status": true
+      }
+    }
+  ],
+  "bip9_softforks": {
+    "csv": {
+      "status": "active",
+      "startTime": 1456790400,
+      "timeout": 1493596800,
+      "since": 770112
+    },
+    "segwit": {
+      "status": "active",
+      "startTime": 1462060800,
+      "timeout": 1493596800,
+      "since": 834624
+    }
+  },
+  "warnings": "Warning: unknown new rules activated (versionbit 28)"
+}

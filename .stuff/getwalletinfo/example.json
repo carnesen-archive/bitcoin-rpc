@@ -1,0 +1,14 @@
+{
+  "walletname": "",
+  "walletversion": 130000,
+  "balance": 0.00000000,
+  "unconfirmed_balance": 0.00000000,
+  "immature_balance": 0.00000000,
+  "txcount": 0,
+  "keypoololdest": 1497498871,
+  "keypoolsize": 1000,
+  "paytxfee": 0.00000000,
+  "hdseedid": "16d8d152997d02cef5f5809c9f73508ab5fec8c7",
+  "hdmasterkeyid": "16d8d152997d02cef5f5809c9f73508ab5fec8c7",
+  "private_keys_enabled": true
+}
