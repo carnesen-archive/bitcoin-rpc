@@ -19,17 +19,25 @@
   "dependencies": {
     "@types/expand-tilde": "2.0.0",
     "@types/ini": "1.3.29",
+    "@types/lodash.uniqwith": "^4.5.4",
     "expand-tilde": "2.0.2",
-    "ini": "1.3.5"
+    "ini": "1.3.5",
+    "lodash.uniqwith": "^4.5.0"
   },
   "devDependencies": {
     "@carnesen/tsconfig": "0.0.1",
-    "@carnesen/tslint-config": "0.0.2",
+    "@carnesen/tslint-config": "0.0.3",
     "@types/fs-extra": "5.0.4",
     "@types/jest": "23.3.9",
+    "@types/lodash.camelcase": "4.3.4",
+    "@types/lodash.isequal": "4.5.3",
+    "@types/lodash.upperfirst": "4.3.4",
     "@types/node": "8.10.38",
     "fs-extra": "7.0.1",
     "jest": "23.6.0",
+    "lodash.camelcase": "4.3.0",
+    "lodash.isequal": "4.5.0",
+    "lodash.upperfirst": "4.3.1",
     "rimraf": "2.6.2",
     "ts-jest": "23.10.5",
     "ts-node": "7.0.1",

@@ -5,13 +5,13 @@ import { readFileSync } from 'fs';
 import expandTilde = require('expand-tilde');
 import { URL } from 'url';
 
-type Flag = 0 | 1;
+type Flag = '0' | '1';
+export const isEnabled = (flag?: Flag) => flag === '1';
 
 export type BitcoinConf = Partial<{
   rpcuser: string;
   rpcpassword: string;
-  rpcauth: string | string[];
-  rpcport: number;
+  rpcport: string;
   rpccookiefile: string;
   testnet: Flag;
   regtest: Flag;
@@ -103,7 +103,16 @@ export const readBitcoinRpcHrefSync = (
         cookieDir = resolvedDatadir;
       }
       cookieFilePath = join(cookieDir, rpccookiefile);
-      const cookieFileContents = readFileSync(cookieFilePath, { encoding: 'utf8' });
+      let cookieFileContents: string;
+      try {
+        cookieFileContents = readFileSync(cookieFilePath, { encoding: 'utf8' });
+      } catch (ex) {
+        if (ex.code === 'ENOENT') {
+          throw new Error(`Expected to find "${cookieFilePath}". Is bitcoind running?`);
+        } else {
+          throw ex;
+        }
+      }
       const [username, password] = cookieFileContents.split(':');
       if (!username || !password) {
         throw new Error('Expected cookie file to contain "username:password"');
@@ -113,16 +122,16 @@ export const readBitcoinRpcHrefSync = (
     }
   }
   const { rpcport, regtest, testnet } = loadedConfiguration;
-  let resolvedPort: number;
+  let resolvedPort: string;
   if (rpcport) {
     resolvedPort = rpcport;
-  } else if (regtest) {
-    resolvedPort = 18443;
-  } else if (testnet) {
-    resolvedPort = 18332;
+  } else if (isEnabled(regtest)) {
+    resolvedPort = '18443';
+  } else if (isEnabled(testnet)) {
+    resolvedPort = '18332';
   } else {
-    resolvedPort = 8332;
+    resolvedPort = '8332';
   }
-  url.port = resolvedPort.toString();
+  url.port = resolvedPort;
   return url.href;
 };

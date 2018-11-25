@@ -1,0 +1,23 @@
+[
+  {
+    "meta": {
+      "method": "getwalletinfo",
+      "version": "/Satoshi:0.17.0/"
+    },
+    "result": {
+      "walletname": "",
+      "walletversion": 169900,
+      "balance": 0,
+      "unconfirmed_balance": 0,
+      "immature_balance": 0,
+      "txcount": 0,
+      "keypoololdest": 1542858720,
+      "keypoolsize": 1000,
+      "keypoolsize_hd_internal": 1000,
+      "paytxfee": 0,
+      "hdseedid": "464b9f9ea5a71785ac8a6c0638c3ea89717442c6",
+      "hdmasterkeyid": "464b9f9ea5a71785ac8a6c0638c3ea89717442c6",
+      "private_keys_enabled": true
+    }
+  }
+]

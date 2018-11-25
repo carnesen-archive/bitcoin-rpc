@@ -1,85 +1,124 @@
-import { ensureDir, readFile } from 'fs-extra';
-import { join } from 'path';
-import {
-  readBitcoinConfSync,
-  readBitcoinRpcHrefSync,
-  BitcoinConf,
-} from './configuration';
+import { ensureDir, readFile, stat, writeFile, readdir } from 'fs-extra';
+import { join, dirname } from 'path';
+import isEqual = require('lodash.isequal');
+import camelCase = require('lodash.camelcase');
+import upperFirst = require('lodash.upperfirst');
+import uniqWith = require('lodash.uniqwith');
+import { readBitcoinConfSync, readBitcoinRpcHrefSync, isEnabled } from './configuration';
 import { JsonRpcClient, JsonRpcParams } from './json-rpc';
-const pkg = require('../package.json');
 
 const methodsDir = join(__dirname, 'methods');
 
 type Example = {
-  meta: any;
-  params?: JsonRpcParams;
+  meta: {
+    method: string;
+    params?: JsonRpcParams;
+    version: string;
+  };
   result: any;
 };
 
+const pascalCase = (str: string) => upperFirst(camelCase(str));
+
+const doNotEditWarning = '// This file is generated programmatically. Do not edit.';
+
 class DevClient {
   private readonly jsonRpcClient: JsonRpcClient;
-  private readonly bitcoinConf: BitcoinConf;
   constructor() {
+    const { regtest } = readBitcoinConfSync();
+    if (!isEnabled(regtest)) {
+      throw new Error('Bitcoin server must be running in "regtest" mode');
+    }
     const href = readBitcoinRpcHrefSync();
     this.jsonRpcClient = new JsonRpcClient(href);
-    this.bitcoinConf = readBitcoinConfSync();
-    if (this.bitcoinConf.rpcpassword) {
-      this.bitcoinConf.rpcpassword = 'xxxxxxx';
-    }
   }
 
-  async getMeta() {
-    const result = await this.jsonRpcClient.rpc('getnetworkinfo');
-    const { version, subversion, protocolversion } = result;
-    return {
-      timestamp: Date.now(),
-      clientVersion: pkg.version,
-      serverVersion: result.subversion,
-    };
-  }
-
-  public async upsertMethod(method: string, params?: JsonRpcParams) {
-    const methodDir = join(methodsDir, method.toLowerCase());
+  private getExamplesFilePath(kebabCasedMethod: string) {
+    const methodDir = join(methodsDir, kebabCasedMethod);
     const examplesFilePath = join(methodDir, 'examples.json');
-    await ensureDir(methodDir);
-    let examplesFileContents: string = '[]';
+    return examplesFilePath;
+  }
+
+  private async readExamples(kebabCasedMethod: string) {
+    const examplesFilePath = this.getExamplesFilePath(kebabCasedMethod);
+    let examples: Example[] = [];
     try {
-      examplesFileContents = await readFile(examplesFilePath, 'utf8');
+      const examplesFileContents = await readFile(examplesFilePath, 'utf8');
+      examples = JSON.parse(examplesFileContents);
     } catch (ex) {
       if (ex.code !== 'ENOENT') {
         throw ex;
       }
+      await ensureDir(dirname(examplesFilePath));
+      await writeFile(examplesFilePath, JSON.stringify(examples));
     }
-    const examples: Example[] = JSON.parse(examplesFileContents);
+    return examples;
+  }
 
+  public async upsertOne(kebabCasedMethod: string, params?: JsonRpcParams) {
+    const pascalCasedMethod = pascalCase(kebabCasedMethod);
+    const method = pascalCasedMethod.toLowerCase();
+    const { subversion: version } = await this.jsonRpcClient.rpc('getnetworkinfo');
+    const meta: Example['meta'] = {
+      method,
+      version,
+    };
+    if (params) {
+      meta.params = params;
+    }
+    const methodDir = join(methodsDir, kebabCasedMethod);
+    const examples = await this.readExamples(kebabCasedMethod);
+    const existingExample = examples.find(example => isEqual(meta, example.meta));
+    if (!existingExample) {
+      const result = await this.jsonRpcClient.rpc(method, params);
+      examples.push({
+        meta,
+        result,
+      });
+      const examplesFileContents = JSON.stringify(examples, null, 2);
+      await ensureDir(methodDir);
+      const examplesFilePath = this.getExamplesFilePath(kebabCasedMethod);
+      await writeFile(examplesFilePath, examplesFileContents);
+    }
     const indexFilePath = join(methodDir, 'index.ts');
+    const paramsTypeString = params ? "(typeof examples[0])['meta']['params']" : 'never';
+    const indexFileContents = `${doNotEditWarning}
+import * as examples from './examples.json';
+
+export type Params = ${paramsTypeString};
+export type Result = (typeof examples[0])['result'];
+export { examples };
+`;
+    await writeFile(indexFilePath, indexFileContents);
+  }
+  public async updateAll() {
+    const fileNames = await readdir(methodsDir);
+    const kebabCasedMethods = fileNames.filter(fileName => fileName !== 'index.ts');
+    for (const kebabCasedMethod of kebabCasedMethods) {
+      const examples: Example[] = await this.readExamples(kebabCasedMethod);
+      const paramsArray = uniqWith(examples.map(example => example.meta.params), isEqual);
+      for (const params of paramsArray) {
+        await this.upsertOne(kebabCasedMethod, params);
+      }
+    }
+    const indexFileItems = kebabCasedMethods.map(kebabCasedMethod => {
+      const pascalCasedMethod = pascalCase(kebabCasedMethod);
+      const importString = `import * as ${pascalCasedMethod} from './${kebabCasedMethod}';`;
+      const exportString = `export { ${pascalCasedMethod} };`;
+      return `${importString}\n${exportString}`;
+    });
+    const indexFileContents = `${doNotEditWarning}\n${indexFileItems.join('\n')}\n`;
+    const indexFilePath = join(methodsDir, 'index.ts');
+    await writeFile(indexFilePath, indexFileContents);
   }
 }
-
-// const examplesDir = join(__dirname, 'examples');
-
-// const getExample = async (method: string, params?: unknown) => {
-//   const meta = await getMeta();
-//   const { request, response } = await sendRequest(method, params);
-//   const methodDir = join(examplesDir, method);
-//   await ensureDir(methodDir);
-//   const exampleName = `example_${meta.timestamp}`;
-//   const fileName = `${exampleName}.json`;
-//   const fileContents = JSON.stringify({ meta, request, response }, null, 2);
-//   await writeFile(join(methodDir, fileName), fileContents);
-//   const indexFilePath = join(__dirname, 'index.ts');
-//   const indexFileCode = `
-// import * as ${exampleName} from './examples/${method}/${fileName}';
-// export { ${exampleName} };
-// `;
-//   await appendFile(indexFilePath, indexFileCode);
-// };
 
 (async () => {
   try {
     const client = new DevClient();
     // const foo = await client.getMeta();
-    await client.upsertMethod('getwalletinfo');
+    // await client.upsertOne('get-wallet-info');
+    await client.updateAll();
     debugger;
     process.exit(0);
   } catch (ex) {
