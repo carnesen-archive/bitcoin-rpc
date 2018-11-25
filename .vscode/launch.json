@@ -10,7 +10,7 @@
       "name": "Launch Program",
       "program": "${workspaceFolder}/node_modules/.bin/ts-node",
       "args": [
-        "src/example.ts"
+        "src/dev.ts"
       ]
     }
   ]

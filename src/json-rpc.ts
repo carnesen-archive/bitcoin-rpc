@@ -1,16 +1,24 @@
 import * as http from 'http';
 import { CodedError } from './error';
+import { URL } from 'url';
 
 type JsonRpcId = null | number | string;
 
-export type JsonRpcRequest<P> = {
-  method: string;
-  params?: P;
-  id?: JsonRpcId;
+type JsonRpcNamedParams = {
+  [name: string]: any;
 };
 
-export type JsonRpcResponse<R> = {
-  result: R;
+export type JsonRpcParams = JsonRpcNamedParams;
+
+export type JsonRpcRequest = {
+  method: string;
+  params?: JsonRpcParams;
+  id?: JsonRpcId;
+  jsonrpc?: '2.0';
+};
+
+export type JsonRpcResponse = {
+  result: any;
   error: null | {
     code: number;
     message: string;
@@ -26,14 +34,21 @@ export class JsonRpcClient {
   }
   public sendData(data: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      const options: http.RequestOptions = {
+      const { protocol, username, password, hostname, port } = new URL(this.href);
+
+      const req = http.request({
+        protocol,
+        hostname,
+        port,
+        auth: `${username}:${password}`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Content-Length': data.length,
         },
-      };
-      const handler = (res: http.IncomingMessage) => {
+      });
+
+      req.once('response', (res: http.IncomingMessage) => {
         let responseData = '';
         if (res.statusCode !== 200) {
           const err = new CodedError(
@@ -50,8 +65,8 @@ export class JsonRpcClient {
         res.on('end', () => {
           resolve(responseData);
         });
-      };
-      const req = http.request(this.href, options, handler);
+      });
+
       req.on('error', (err: NodeJS.ErrnoException) => {
         reject(new CodedError(`http request failed "${err.message}"`, err.code));
       });
@@ -60,10 +75,10 @@ export class JsonRpcClient {
     });
   }
 
-  public async sendRequest<P, R>(jsonRpcRequest: JsonRpcRequest<P>) {
+  public async sendRequest(jsonRpcRequest: JsonRpcRequest) {
     const data = JSON.stringify(jsonRpcRequest);
     const responseData = await this.sendData(data);
-    let jsonRpcResponse: JsonRpcResponse<R>;
+    let jsonRpcResponse: JsonRpcResponse;
     try {
       jsonRpcResponse = JSON.parse(responseData);
     } catch (ex) {
@@ -72,6 +87,13 @@ export class JsonRpcClient {
     if (jsonRpcResponse.error) {
       throw new CodedError(jsonRpcResponse.error.message, jsonRpcResponse.error.code);
     }
-    return jsonRpcResponse.result as R;
+    return jsonRpcResponse.result;
+  }
+
+  public rpc(method: string, params?: JsonRpcParams) {
+    return this.sendRequest({
+      method,
+      params,
+    });
   }
 }

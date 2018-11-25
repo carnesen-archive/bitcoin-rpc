@@ -7,7 +7,7 @@ import { URL } from 'url';
 
 type Flag = 0 | 1;
 
-type BitcoinConf = Partial<{
+export type BitcoinConf = Partial<{
   rpcuser: string;
   rpcpassword: string;
   rpcauth: string | string[];
