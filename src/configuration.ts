@@ -5,16 +5,16 @@ import { readFileSync } from 'fs';
 import expandTilde = require('expand-tilde');
 import { URL } from 'url';
 
-type Flag = '0' | '1';
-export const isEnabled = (flag?: Flag) => flag === '1';
+export type BitcoinConfFlag = '0' | '1';
+export const isEnabled = (flag?: BitcoinConfFlag) => flag === '1';
 
 export type BitcoinConf = Partial<{
   rpcuser: string;
   rpcpassword: string;
   rpcport: string;
   rpccookiefile: string;
-  testnet: Flag;
-  regtest: Flag;
+  testnet: BitcoinConfFlag;
+  regtest: BitcoinConfFlag;
   datadir: string;
 }>;
 

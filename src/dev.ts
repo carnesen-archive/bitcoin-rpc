@@ -6,6 +6,8 @@ import upperFirst = require('lodash.upperfirst');
 import uniqWith = require('lodash.uniqwith');
 import { readBitcoinConfSync, readBitcoinRpcHrefSync, isEnabled } from './configuration';
 import { JsonRpcClient, JsonRpcParams } from './json-rpc';
+import { promisify } from 'util';
+import { execFile } from 'child_process';
 
 const methodsDir = join(__dirname, 'methods');
 
@@ -31,6 +33,23 @@ class DevClient {
     }
     const href = readBitcoinRpcHrefSync();
     this.jsonRpcClient = new JsonRpcClient(href);
+  }
+
+  private async quicktype(jsonFilePath: string) {
+    const { stdout } = await promisify(execFile)('quicktype', [
+      '--src',
+      jsonFilePath,
+      '--src-lang',
+      'json',
+      '--lang',
+      'ts',
+      '--just-types',
+    ]);
+    return stdout;
+  }
+
+  private async fix(tsFilePath: string) {
+    await promisify(execFile)('tslint', ['--fix', tsFilePath]);
   }
 
   private getExamplesFilePath(kebabCasedMethod: string) {
@@ -69,6 +88,7 @@ class DevClient {
     const methodDir = join(methodsDir, kebabCasedMethod);
     const examples = await this.readExamples(kebabCasedMethod);
     const existingExample = examples.find(example => isEqual(meta, example.meta));
+    const examplesFilePath = this.getExamplesFilePath(kebabCasedMethod);
     if (!existingExample) {
       const result = await this.jsonRpcClient.rpc(method, params);
       examples.push({
@@ -77,20 +97,23 @@ class DevClient {
       });
       const examplesFileContents = JSON.stringify(examples, null, 2);
       await ensureDir(methodDir);
-      const examplesFilePath = this.getExamplesFilePath(kebabCasedMethod);
       await writeFile(examplesFilePath, examplesFileContents);
     }
     const indexFilePath = join(methodDir, 'index.ts');
-    const paramsTypeString = params ? "(typeof examples[0])['meta']['params']" : 'never';
-    const indexFileContents = `${doNotEditWarning}
-import * as examples from './examples.json';
+    const quicktypeOutput = await this.quicktype(examplesFilePath);
+    const indexFileContents = [
+      doNotEditWarning,
+      '',
+      'import * as examples from "./examples.json";',
+      'export { examples };',
+      '',
+      quicktypeOutput,
+    ].join('\n');
 
-export type Params = ${paramsTypeString};
-export type Result = (typeof examples[0])['result'];
-export { examples };
-`;
     await writeFile(indexFilePath, indexFileContents);
+    await this.fix(indexFilePath);
   }
+
   public async updateAll() {
     const fileNames = await readdir(methodsDir);
     const kebabCasedMethods = fileNames.filter(fileName => fileName !== 'index.ts');
@@ -103,13 +126,14 @@ export { examples };
     }
     const indexFileItems = kebabCasedMethods.map(kebabCasedMethod => {
       const pascalCasedMethod = pascalCase(kebabCasedMethod);
-      const importString = `import * as ${pascalCasedMethod} from './${kebabCasedMethod}';`;
+      const importString = `import * as ${pascalCasedMethod} from "./${kebabCasedMethod}";`;
       const exportString = `export { ${pascalCasedMethod} };`;
       return `${importString}\n${exportString}`;
     });
-    const indexFileContents = `${doNotEditWarning}\n${indexFileItems.join('\n')}\n`;
+    const indexFileContents = `${doNotEditWarning}\n\n${indexFileItems.join('\n')}\n`;
     const indexFilePath = join(methodsDir, 'index.ts');
     await writeFile(indexFilePath, indexFileContents);
+    await this.fix(indexFilePath);
   }
 }
 
@@ -118,8 +142,11 @@ export { examples };
     const client = new DevClient();
     // const foo = await client.getMeta();
     // await client.upsertOne('get-wallet-info');
+    // await client.upsertOne('get-wallet-info', {
+    //   blockhash: '0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206',
+    //   verbosity: 0,
+    // });
     await client.updateAll();
-    debugger;
     process.exit(0);
   } catch (ex) {
     setTimeout(() => {

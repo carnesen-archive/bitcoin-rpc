@@ -1,16 +1,16 @@
-import { JsonRpcClient } from './json-rpc';
+// import { JsonRpcClient } from './json-rpc';
 
 export class BitcoinRpcClient {
-  private readonly jsonRpcClient: JsonRpcClient;
-  constructor(href: string) {
-    this.jsonRpcClient = new JsonRpcClient(href);
-  }
-  public rpc<P, R>(method: string, params: P) {
-    return this.jsonRpcClient.sendRequest({
-      method,
-      params,
-    });
-  }
+  // private readonly jsonRpcClient: JsonRpcClient;
+  // constructor(href: string) {
+  //   this.jsonRpcClient = new JsonRpcClient(href);
+  // }
+  // public rpc<P, R>(method: string, params: P) {
+  //   return this.jsonRpcClient.sendRequest({
+  //     method,
+  //     params,
+  //   });
+  // }
   // public getBestBlockHash() {
   //   return this.rpc<types.GetBestBlockHashResult>('getbestblockhash');
   // }
