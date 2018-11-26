@@ -19,10 +19,8 @@
   "dependencies": {
     "@types/expand-tilde": "2.0.0",
     "@types/ini": "1.3.29",
-    "@types/lodash.uniqwith": "^4.5.4",
     "expand-tilde": "2.0.2",
-    "ini": "1.3.5",
-    "lodash.uniqwith": "^4.5.0"
+    "ini": "1.3.5"
   },
   "devDependencies": {
     "@carnesen/tsconfig": "0.0.1",

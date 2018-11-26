@@ -3,7 +3,6 @@ import { join } from 'path';
 import isEqual = require('lodash.isequal');
 import camelCase = require('lodash.camelcase');
 import upperFirst = require('lodash.upperfirst');
-import uniqWith = require('lodash.uniqwith');
 import { readBitcoinConfSync, readBitcoinRpcHrefSync, isEnabled } from './configuration';
 import { JsonRpcClient, JsonRpcParams, JsonRpcRequest, JsonRpcResult } from './json-rpc';
 import { promisify } from 'util';
@@ -112,20 +111,27 @@ class DevClient {
     await writeExamples(dirName, examples);
   }
 
-  // public async upsertOne(kebabCasedMethod: string, params?: JsonRpcParams) {
-  //   const pascalCasedMethod = pascalCase(kebabCasedMethod);
-  //   const method = pascalCasedMethod.toLowerCase();
-  //   let v: string;
-  //   if (params) {
-  //     const { verbose, verbosity } = params;
-  //     if (typeof verbose === 'number') {
-  //       v = verbose.toString();
-  //     } else if (typeof verbosity === 'number') {
-  //       v = verbosity.toString();
-  //     }
-  //   }
-  // }
-
+  public async bootstrap(kebabCasedMethod: string, params?: JsonRpcParams) {
+    const pascalCasedMethod = pascalCase(kebabCasedMethod);
+    const method = pascalCasedMethod.toLowerCase();
+    let verbosityString: string = '';
+    if (params) {
+      const { verbose, verbosity } = params;
+      if (typeof verbose === 'number') {
+        verbosityString = verbose.toString();
+      } else if (typeof verbosity === 'number') {
+        verbosityString = verbosity.toString();
+      }
+    }
+    let dirName = kebabCasedMethod;
+    if (verbosityString) {
+      dirName += `-${verbosityString}`;
+    }
+    await this.upsertExample(dirName, {
+      method,
+      params: isEqual(params, {}) ? undefined : params,
+    });
+  }
   public async updateAll() {
     const fileNames = await readdir(methodsDir);
     const dirNames = fileNames.filter(fileName => fileName !== 'index.ts');
@@ -148,25 +154,21 @@ class DevClient {
   }
 }
 
-(async () => {
+const runAndExit = async (func: () => Promise<void>) => {
   try {
-    const client = new DevClient();
-    await client.upsertExample('get-block-2', {
-      method: 'getblock',
-      params: {
-        blockhash: '0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206',
-        verbosity: 2,
-      },
-    });
-    // await client.upsertOne('get-wallet-info', {
-    //   blockhash: '0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206',
-    //   verbosity: 0,
-    // });
-    await client.updateAll();
+    await func();
     process.exit(0);
   } catch (ex) {
-    setTimeout(() => {
+    setImmediate(() => {
       throw ex;
-    }, 0);
+    });
   }
-})();
+};
+
+if (require.main === module) {
+  runAndExit(async () => {
+    const client = new DevClient();
+    await client.bootstrap('get-blockchain-info', {});
+    await client.updateAll();
+  });
+}

@@ -1,0 +1,61 @@
+[
+  {
+    "server": {
+      "subversion": "/Satoshi:0.17.0/"
+    },
+    "request": {
+      "method": "getblockchaininfo"
+    },
+    "result": {
+      "chain": "regtest",
+      "blocks": 0,
+      "headers": 0,
+      "bestblockhash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+      "difficulty": 4.656542373906925e-10,
+      "mediantime": 1296688602,
+      "verificationprogress": 1,
+      "initialblockdownload": true,
+      "chainwork": "0000000000000000000000000000000000000000000000000000000000000002",
+      "size_on_disk": 293,
+      "pruned": false,
+      "softforks": [
+        {
+          "id": "bip34",
+          "version": 2,
+          "reject": {
+            "status": false
+          }
+        },
+        {
+          "id": "bip66",
+          "version": 3,
+          "reject": {
+            "status": false
+          }
+        },
+        {
+          "id": "bip65",
+          "version": 4,
+          "reject": {
+            "status": false
+          }
+        }
+      ],
+      "bip9_softforks": {
+        "csv": {
+          "status": "defined",
+          "startTime": 0,
+          "timeout": 9223372036854776000,
+          "since": 0
+        },
+        "segwit": {
+          "status": "active",
+          "startTime": -1,
+          "timeout": 9223372036854776000,
+          "since": 0
+        }
+      },
+      "warnings": ""
+    }
+  }
+]
