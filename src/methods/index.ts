@@ -1,4 +1,4 @@
 // This file is generated programmatically. Do not edit.
 
-import * as GetWalletInfo from './get-wallet-info';
-export { GetWalletInfo };
+import * as GetBlockHash from './get-block-hash';
+export { GetBlockHash };

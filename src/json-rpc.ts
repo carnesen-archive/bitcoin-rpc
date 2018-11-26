@@ -10,6 +10,8 @@ type JsonRpcNamedParams = {
 
 export type JsonRpcParams = JsonRpcNamedParams;
 
+export type JsonRpcResult = any;
+
 export type JsonRpcRequest = {
   method: string;
   params?: JsonRpcParams;
@@ -18,7 +20,7 @@ export type JsonRpcRequest = {
 };
 
 export type JsonRpcResponse = {
-  result: any;
+  result: JsonRpcResult;
   error: null | {
     code: number;
     message: string;
