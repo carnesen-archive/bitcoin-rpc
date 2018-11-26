@@ -1,5 +1,5 @@
-import { ensureDir, readFile, stat, writeFile, readdir } from 'fs-extra';
-import { join, dirname } from 'path';
+import { ensureDir, readFile, writeFile, readdir } from 'fs-extra';
+import { join } from 'path';
 import isEqual = require('lodash.isequal');
 import camelCase = require('lodash.camelcase');
 import upperFirst = require('lodash.upperfirst');
@@ -64,13 +64,16 @@ const writeExamples = async (dirName: string, examples: Example[]) => {
     'ts',
     '--just-types',
   ]);
+  const transformedQuicktypeOutput = quicktypeOutput
+    .replace(/export interface (.*) {/g, 'export type $1 = {')
+    .replace(/Examples/g, 'Example');
   const indexFileContents = [
     doNotEditWarning,
     '',
-    'import * as examples from "./examples.json";',
-    'export { examples };',
+    "import * as examplesJson from './examples.json';",
+    'export const examples: Example[] = examplesJson;',
     '',
-    quicktypeOutput,
+    transformedQuicktypeOutput,
   ].join('\n');
   const indexFilePath = join(methodDir, 'index.ts');
   await writeFile(indexFilePath, indexFileContents);
@@ -105,8 +108,8 @@ class DevClient {
         request,
         result,
       });
-      await writeExamples(dirName, examples);
     }
+    await writeExamples(dirName, examples);
   }
 
   // public async upsertOne(kebabCasedMethod: string, params?: JsonRpcParams) {
@@ -148,9 +151,12 @@ class DevClient {
 (async () => {
   try {
     const client = new DevClient();
-    await client.upsertExample('get-block-hash', {
-      method: 'getblockhash',
-      params: { height: 0 },
+    await client.upsertExample('get-block-2', {
+      method: 'getblock',
+      params: {
+        blockhash: '0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206',
+        verbosity: 2,
+      },
     });
     // await client.upsertOne('get-wallet-info', {
     //   blockhash: '0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206',
