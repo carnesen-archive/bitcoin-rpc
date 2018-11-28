@@ -21,9 +21,9 @@ export type Params = {
 
 export type Result = {
   confirmations: number;
-  strippedsize: number;
+  strippedsize?: number;
   size: number;
-  weight: number;
+  weight?: number;
   height: number;
   version: number;
   versionHex: string;
@@ -35,7 +35,8 @@ export type Result = {
   bits: string;
   difficulty: number;
   chainwork: string;
-  nTx: number;
+  nTx?: number;
+  hash?: string;
 };
 
 export type Tx = {
@@ -43,12 +44,12 @@ export type Tx = {
   hash: string;
   version: number;
   size: number;
-  vsize: number;
-  weight: number;
+  vsize?: number;
+  weight?: number;
   locktime: number;
   vin: Vin[];
   vout: Vout[];
-  hex: string;
+  hex?: string;
 };
 
 export type Vin = {

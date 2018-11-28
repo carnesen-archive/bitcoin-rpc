@@ -1,0 +1,65 @@
+[
+  {
+    "server": {
+      "subversion": "/Satoshi:0.17.0/"
+    },
+    "request": {
+      "method": "getblock",
+      "params": {
+        "blockhash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+        "verbosity": 1
+      }
+    },
+    "result": {
+      "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+      "confirmations": 1,
+      "strippedsize": 285,
+      "size": 285,
+      "weight": 1140,
+      "height": 0,
+      "version": 1,
+      "versionHex": "00000001",
+      "merkleroot": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+      "tx": [
+        "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
+      ],
+      "time": 1296688602,
+      "mediantime": 1296688602,
+      "nonce": 2,
+      "bits": "207fffff",
+      "difficulty": 4.656542373906925e-10,
+      "chainwork": "0000000000000000000000000000000000000000000000000000000000000002",
+      "nTx": 1
+    }
+  },
+  {
+    "server": {
+      "subversion": "/Bitcoin ABC:0.18.5(EB32.0)/"
+    },
+    "request": {
+      "method": "getblock",
+      "params": {
+        "blockhash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+        "verbosity": 1
+      }
+    },
+    "result": {
+      "hash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+      "confirmations": 1,
+      "size": 285,
+      "height": 0,
+      "version": 1,
+      "versionHex": "00000001",
+      "merkleroot": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+      "tx": [
+        "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
+      ],
+      "time": 1296688602,
+      "mediantime": 1296688602,
+      "nonce": 2,
+      "bits": "207fffff",
+      "difficulty": 4.656542373906925e-10,
+      "chainwork": "0000000000000000000000000000000000000000000000000000000000000002"
+    }
+  }
+]

@@ -21,13 +21,13 @@ export type Result = {
   difficulty: number;
   mediantime: number;
   verificationprogress: number;
-  initialblockdownload: boolean;
+  initialblockdownload?: boolean;
   chainwork: string;
-  size_on_disk: number;
+  size_on_disk?: number;
   pruned: boolean;
   softforks: Softfork[];
-  bip9_softforks: Bip9Softforks;
-  warnings: string;
+  bip9_softforks?: Bip9Softforks;
+  warnings?: string;
 };
 
 export type Bip9Softforks = {
