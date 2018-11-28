@@ -12,7 +12,10 @@ import { JsonRpcClient, JsonRpcParams, JsonRpcRequest, JsonRpcResult } from './j
 import { parse } from 'semver';
 
 type Example = {
-  params?: JsonRpcParams;
+  info: {
+    subversion: string;
+  }
+  request: JsonRpcRequest;
   result: JsonRpcResult;
 };
 
@@ -66,24 +69,23 @@ const fix = async (filePath: string) => {
 
 const methodCase = (str: string) => camelCase(str).toLowerCase();
 
-const getDir = (
+const getMethodDir = (
   implementation: Implementation,
   kebabCasedMethod: string,
   params?: JsonRpcParams,
 ) => {
-  const method = methodCase(kebabCasedMethod);
   let verbosityString: string = '';
   if (params) {
     const { verbose, verbosity } = params;
     if (typeof verbose === 'number') {
-      verbosityString = verbose.toString();
+      verbosityString = `verbose-${verbose.toString()}`;
     } else if (typeof verbosity === 'number') {
-      verbosityString = verbosity.toString();
+      verbosityString = `verbosity-${verbosity.toString()}`;
     }
   }
-  let dirName = method;
+  let dirName = kebabCasedMethod;
   if (verbosityString) {
-    dirName += `-${verbosityString}`;
+    dirName += `_${verbosityString}`;
   }
   return join(
     __dirname,
@@ -94,8 +96,17 @@ const getDir = (
   );
 };
 
-const readExamplesJson = async (dir: string) => {
-  const examplesFilePath = join(dir, 'examples.json');
+const parseMethodDirName = (methodDirName: string) => {
+  const [kebabCasedMethod, paramsString] = methodDirName.split('_');
+  const params: {  } = paramsString ? 
+  return {
+    kebabCasedMethod,
+    params,
+  }
+};
+
+const readMethodExamplesJson = async (methodDir: string) => {
+  const examplesFilePath = join(methodDir, 'examples.json');
   let examples: Example[] = [];
   try {
     const examplesFileContents = await promisify(readFile)(examplesFilePath, {
@@ -110,14 +121,14 @@ const readExamplesJson = async (dir: string) => {
   return examples;
 };
 
-const writeExamplesJson = async (dir: string, examples: Example[]) => {
-  const examplesFilePath = join(dir, 'examples.json');
-  await ensureDir(dir);
+const writeMethodExamplesJson = async (methodDir: string, examples: Example[]) => {
+  const examplesFilePath = join(methodDir, 'examples.json');
+  await ensureDir(methodDir);
   await promisify(writeFile)(examplesFilePath, JSON.stringify(examples, null, 2));
 };
 
-const writeIndexTs = async (dir: string) => {
-  const examplesFilePath = join(dir, 'examples.json');
+const writeMethodIndexTs = async (methodDir: string) => {
+  const examplesFilePath = join(methodDir, 'examples.json');
   const { stdout: quicktypeOutput } = await promisify(execFile)('quicktype', [
     '--src',
     examplesFilePath,
@@ -129,7 +140,9 @@ const writeIndexTs = async (dir: string) => {
   ]);
   const transformedQuicktypeOutput = quicktypeOutput
     .replace(/export interface (.*) {/g, 'export type $1 = {')
-    .replace(/Examples/g, 'Example');
+    .replace(/Examples/g, 'Example')
+    .replace(/verbosity: number;/g, '// Note: verbosity has special handling')
+    .replace(/verbose: number;/g, '// Note: verbose has special handling');
   const indexFileContents = [
     doNotEditWarning,
     '',
@@ -138,7 +151,22 @@ const writeIndexTs = async (dir: string) => {
     '',
     transformedQuicktypeOutput,
   ].join('\n');
-  const indexFilePath = join(dir, 'index.ts');
+  const indexFilePath = join(methodDir, 'index.ts');
+  await promisify(writeFile)(indexFilePath, indexFileContents);
+  await fix(indexFilePath);
+};
+
+const writeImplementationIndexTs = async (implementationDir: string) => {
+  const dirNames = await promisify(readdir)(implementationDir);
+  const methodDirNames = dirNames.filter(fileName => fileName !== 'index.ts');
+  const indexFileItems = methodDirNames.map(methodDirName => {
+    const pascalCasedDirName = pascalCase(methodDirName);
+    const importString = `import * as ${pascalCasedDirName} from "./${methodDirName}";`;
+    const exportString = `export { ${pascalCasedDirName} };`;
+    return `${importString}\n${exportString}`;
+  });
+  const indexFileContents = `${doNotEditWarning}\n\n${indexFileItems.join('\n')}\n`;
+  const indexFilePath = join(implementationDir, 'index.ts');
   await promisify(writeFile)(indexFilePath, indexFileContents);
   await fix(indexFilePath);
 };
@@ -157,8 +185,8 @@ class DevClient {
   public async upsertExample(kebabCasedMethod: string, params?: JsonRpcParams) {
     const { subversion } = await this.jsonRpcClient.rpc('getnetworkinfo');
     const implementation = parseSubversion(subversion);
-    const dir = getDir(implementation, kebabCasedMethod, params);
-    const examples = await readExamplesJson(dir);
+    const methodDir = getMethodDir(implementation, kebabCasedMethod, params);
+    const examples = await readMethodExamplesJson(methodDir);
     const existingExample = examples.find(example => isEqual(example.params, params));
     if (!existingExample) {
       const result = await this.jsonRpcClient.rpc(methodCase(kebabCasedMethod), params);
@@ -166,8 +194,8 @@ class DevClient {
         params,
         result,
       });
-      await writeExamplesJson(dir, examples);
-      await writeIndexTs(dir);
+      await writeMethodExamplesJson(methodDir, examples);
+      await writeMethodIndexTs(methodDir);
     }
   }
 
@@ -207,6 +235,11 @@ const runAndExit = async (func: () => Promise<void>) => {
 if (require.main === module) {
   runAndExit(async () => {
     const client = new DevClient();
-    await client.upsertExample('get-block', { verbosity: 1 });
+    await client.upsertExample('get-best-block-hash');
+    // await client.upsertExample('get-block', {
+    //   verbosity: 2,
+    //   blockhash: '0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206',
+    // });
+    await writeImplementationIndexTs(join(__dirname, 'generated', 'abc', 'v0-18'));
   });
 }
