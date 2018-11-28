@@ -11,11 +11,8 @@ import { readBitcoinConfSync, readBitcoinRpcHrefSync, isEnabled } from './config
 import { JsonRpcClient, JsonRpcParams, JsonRpcRequest, JsonRpcResult } from './json-rpc';
 import { parse } from 'semver';
 
-const generatedDir = join(__dirname, 'generated');
-
 type Example = {
-  subversion: string;
-  request: JsonRpcRequest;
+  params?: JsonRpcParams;
   result: JsonRpcResult;
 };
 
@@ -24,6 +21,7 @@ type Implementation = {
   name: ImplementationName;
   version: string;
 };
+
 const parseSubversion = (subversion: string) => {
   const regexpString = '^/(.*):(.*)/$';
   const matches = subversion.match(regexpString);
@@ -42,7 +40,7 @@ const parseSubversion = (subversion: string) => {
     default:
       throw new Error(`Unknown implementation "${nameMatch}"`);
   }
-  const versionStrings = findVersions(versionMatch, { loose: true });
+  const versionStrings = findVersions(versionMatch);
   if (versionStrings.length !== 1) {
     throw new Error(`Unexpected version string "${versionMatch}"`);
   }
@@ -53,16 +51,10 @@ const parseSubversion = (subversion: string) => {
   }
   const implementation: Implementation = {
     name,
-    version: `v${version.major}.${version.minor}`,
+    version: `v${version.major}-${version.minor}`,
   };
   return implementation;
 };
-
-const isEqualRequest = (r1: JsonRpcRequest, r2: JsonRpcRequest) => {
-  return isEqual(r1.params, r2.params) && r1.method === r2.method;
-};
-
-const isEqualImplementation = (i1: Implementation, i2: Implementation) => isEqual(i1, i2);
 
 const pascalCase = (str: string) => upperFirst(camelCase(str));
 
@@ -72,8 +64,35 @@ const fix = async (filePath: string) => {
   await promisify(execFile)('tslint', ['--fix', filePath]);
 };
 
-const getMethodDir = (implementation: Implementation, methodId: string) =>
-  join(generatedDir, implementation.name, implementation.version, methodId);
+const methodCase = (str: string) => camelCase(str).toLowerCase();
+
+const getDir = (
+  implementation: Implementation,
+  kebabCasedMethod: string,
+  params?: JsonRpcParams,
+) => {
+  const method = methodCase(kebabCasedMethod);
+  let verbosityString: string = '';
+  if (params) {
+    const { verbose, verbosity } = params;
+    if (typeof verbose === 'number') {
+      verbosityString = verbose.toString();
+    } else if (typeof verbosity === 'number') {
+      verbosityString = verbosity.toString();
+    }
+  }
+  let dirName = method;
+  if (verbosityString) {
+    dirName += `-${verbosityString}`;
+  }
+  return join(
+    __dirname,
+    'generated',
+    implementation.name,
+    implementation.version,
+    dirName,
+  );
+};
 
 const readExamplesJson = async (dir: string) => {
   const examplesFilePath = join(dir, 'examples.json');
@@ -129,75 +148,49 @@ class DevClient {
   constructor() {
     const { regtest } = readBitcoinConfSync();
     if (!isEnabled(regtest)) {
-      throw new Error('Bitcoin server must be running in "regtest" mode');
+      throw new Error('Bitcoin server software must be running in "regtest" mode');
     }
     const href = readBitcoinRpcHrefSync();
     this.jsonRpcClient = new JsonRpcClient(href);
   }
 
-  public async upsertExample(dirName: string, request: JsonRpcRequest) {
+  public async upsertExample(kebabCasedMethod: string, params?: JsonRpcParams) {
     const { subversion } = await this.jsonRpcClient.rpc('getnetworkinfo');
-    const server: Implementation = {
-      subversion,
-    };
-    const examples = await readExamplesJson(dirName);
-    const existingExample = examples.find(
-      example =>
-        isEqualImplementation(server, example.implementation) &&
-        isEqualRequest(request, example.request),
-    );
+    const implementation = parseSubversion(subversion);
+    const dir = getDir(implementation, kebabCasedMethod, params);
+    const examples = await readExamplesJson(dir);
+    const existingExample = examples.find(example => isEqual(example.params, params));
     if (!existingExample) {
-      const result = await this.jsonRpcClient.sendRequest(request);
+      const result = await this.jsonRpcClient.rpc(methodCase(kebabCasedMethod), params);
       examples.push({
-        implementation,
-        request,
+        params,
         result,
       });
+      await writeExamplesJson(dir, examples);
+      await writeIndexTs(dir);
     }
-    await writeExamplesJson(dirName, examples);
   }
 
-  public async bootstrap(kebabCasedMethod: string, params?: JsonRpcParams) {
-    const pascalCasedMethod = pascalCase(kebabCasedMethod);
-    const method = pascalCasedMethod.toLowerCase();
-    let verbosityString: string = '';
-    if (params) {
-      const { verbose, verbosity } = params;
-      if (typeof verbose === 'number') {
-        verbosityString = verbose.toString();
-      } else if (typeof verbosity === 'number') {
-        verbosityString = verbosity.toString();
-      }
-    }
-    let dirName = kebabCasedMethod;
-    if (verbosityString) {
-      dirName += `-${verbosityString}`;
-    }
-    await this.upsertExample(dirName, {
-      method,
-      params: isEqual(params, {}) ? undefined : params,
-    });
-  }
-  public async updateAll() {
-    const fileNames = await readdir(generatedDir);
-    const dirNames = fileNames.filter(fileName => fileName !== 'index.ts');
-    for (const dirName of dirNames) {
-      const examples = await readExamplesJson(dirName);
-      for (const example of examples) {
-        await this.upsertExample(dirName, example.request);
-      }
-    }
-    const indexFileItems = dirNames.map(dirName => {
-      const pascalCasedDirName = pascalCase(dirName);
-      const importString = `import * as ${pascalCasedDirName} from "./${dirName}";`;
-      const exportString = `export { ${pascalCasedDirName} };`;
-      return `${importString}\n${exportString}`;
-    });
-    const indexFileContents = `${doNotEditWarning}\n\n${indexFileItems.join('\n')}\n`;
-    const indexFilePath = join(generatedDir, 'index.ts');
-    await writeFile(indexFilePath, indexFileContents);
-    await fix(indexFilePath);
-  }
+  // public async updateAll() {
+  //   const fileNames = await readdir(__dirname);
+  //   const dirNames = fileNames.filter(fileName => fileName !== 'index.ts');
+  //   for (const dirName of dirNames) {
+  //     const examples = await readExamplesJson(dirName);
+  //     for (const example of examples) {
+  //       await this.upsertExample(dirName, example.request);
+  //     }
+  //   }
+  //   const indexFileItems = dirNames.map(dirName => {
+  //     const pascalCasedDirName = pascalCase(dirName);
+  //     const importString = `import * as ${pascalCasedDirName} from "./${dirName}";`;
+  //     const exportString = `export { ${pascalCasedDirName} };`;
+  //     return `${importString}\n${exportString}`;
+  //   });
+  //   const indexFileContents = `${doNotEditWarning}\n\n${indexFileItems.join('\n')}\n`;
+  //   const indexFilePath = join(__dirname, 'index.ts');
+  //   await writeFile(indexFilePath, indexFileContents);
+  //   await fix(indexFilePath);
+  // }
 }
 
 const runAndExit = async (func: () => Promise<void>) => {
@@ -214,7 +207,6 @@ const runAndExit = async (func: () => Promise<void>) => {
 if (require.main === module) {
   runAndExit(async () => {
     const client = new DevClient();
-    // await client.bootstrap('get-blockchain-info', {});
-    await client.updateAll();
+    await client.upsertExample('get-block', { verbosity: 1 });
   });
 }
