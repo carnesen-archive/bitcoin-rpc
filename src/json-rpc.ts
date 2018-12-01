@@ -84,18 +84,8 @@ export class JsonRpcClient {
     try {
       jsonRpcResponse = JSON.parse(responseData);
     } catch (ex) {
-      throw new CodedError(`Failed to parse response data "${ex.message}"`, 'BAD_DATA');
+      throw new Error(`Failed to parse response data "${ex.message}"`);
     }
-    if (jsonRpcResponse.error) {
-      throw new CodedError(jsonRpcResponse.error.message, jsonRpcResponse.error.code);
-    }
-    return jsonRpcResponse.result;
-  }
-
-  public rpc(method: string, params?: JsonRpcParams) {
-    return this.sendRequest({
-      method,
-      params,
-    });
+    return jsonRpcResponse;
   }
 }

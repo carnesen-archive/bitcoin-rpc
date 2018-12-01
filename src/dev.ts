@@ -1,28 +1,40 @@
 import { readFile, writeFile, readdir } from 'fs';
-import { join } from 'path';
+import { join, resolve, dirname } from 'path';
 import { promisify } from 'util';
 import { execFile } from 'child_process';
-import { ensureDir, pathExists } from 'fs-extra';
+import { ensureDir } from 'fs-extra';
 import isEqual = require('lodash.isequal');
 import camelCase = require('lodash.camelcase');
 import upperFirst = require('lodash.upperfirst');
+import uniqWith = require('lodash.uniqwith');
 import findVersions = require('find-versions');
 import { readBitcoinConfSync, readBitcoinRpcHrefSync, isEnabled } from './configuration';
-import { JsonRpcClient, JsonRpcParams, JsonRpcRequest, JsonRpcResult } from './json-rpc';
+import {
+  JsonRpcClient,
+  JsonRpcParams,
+  JsonRpcRequest,
+  JsonRpcResponse,
+} from './json-rpc';
 import { parse } from 'semver';
 
-type Example = {
-  info: {
-    subversion: string;
-  }
-  request: JsonRpcRequest;
-  result: JsonRpcResult;
+const TOP_DIR = resolve(__dirname, '..');
+const EXAMPLES_DIR = join(TOP_DIR, 'examples');
+const TMP_DIR = join(TOP_DIR, 'tmp');
+const GENERATED_DIR = join(TOP_DIR, 'src', 'generated');
+
+type MethodId = {
+  methodName: string;
+  implementationName: 'abc' | 'core';
+  implementationVersion: string;
 };
 
-type ImplementationName = 'abc' | 'core';
-type Implementation = {
-  name: ImplementationName;
-  version: string;
+type Example = {
+  methodId: MethodId;
+  info: {
+    subversion: string;
+  };
+  request: JsonRpcRequest;
+  response: JsonRpcResponse;
 };
 
 const parseSubversion = (subversion: string) => {
@@ -32,87 +44,68 @@ const parseSubversion = (subversion: string) => {
     throw new Error(`Expected subversion "${subversion}" to match ${regexpString}`);
   }
   const [, nameMatch, versionMatch] = matches;
-  let name: ImplementationName;
+  let implementationName: MethodId['implementationName'];
   switch (nameMatch) {
     case 'Satoshi':
-      name = 'core';
+      implementationName = 'core';
       break;
     case 'Bitcoin ABC':
-      name = 'abc';
+      implementationName = 'abc';
       break;
     default:
       throw new Error(`Unknown implementation "${nameMatch}"`);
   }
-  const versionStrings = findVersions(versionMatch);
-  if (versionStrings.length !== 1) {
+  const semverVersionStrings = findVersions(versionMatch);
+  if (semverVersionStrings.length !== 1) {
     throw new Error(`Unexpected version string "${versionMatch}"`);
   }
-  const versionString = versionStrings[0];
-  const version = parse(versionString);
-  if (!version) {
+  const semverVersionString = semverVersionStrings[0];
+  const semver = parse(semverVersionString);
+  if (!semver) {
     throw new Error('Failed to parse found version string');
   }
-  const implementation: Implementation = {
-    name,
-    version: `v${version.major}-${version.minor}`,
+  return {
+    implementationName,
+    implementationVersion: `v${semver.major}-${semver.minor}`,
   };
-  return implementation;
 };
 
 const pascalCase = (str: string) => upperFirst(camelCase(str));
+const methodCase = (str: string) => camelCase(str).toLowerCase();
 
-const doNotEditWarning = '// This file is generated programmatically. Do not edit.';
-
-const fix = async (filePath: string) => {
+const writeTsFile = async (filePath: string, fileContents: string) => {
+  await ensureDir(dirname(filePath));
+  await promisify(writeFile)(
+    filePath,
+    `// This file is generated programmatically. Do not edit.\n\n${fileContents}`,
+  );
   await promisify(execFile)('tslint', ['--fix', filePath]);
 };
 
-const methodCase = (str: string) => camelCase(str).toLowerCase();
-
-const getMethodDir = (
-  implementation: Implementation,
-  kebabCasedMethod: string,
-  params?: JsonRpcParams,
-) => {
-  let verbosityString: string = '';
-  if (params) {
-    const { verbose, verbosity } = params;
-    if (typeof verbose === 'number') {
-      verbosityString = `verbose-${verbose.toString()}`;
-    } else if (typeof verbosity === 'number') {
-      verbosityString = `verbosity-${verbosity.toString()}`;
-    }
-  }
-  let dirName = kebabCasedMethod;
-  if (verbosityString) {
-    dirName += `_${verbosityString}`;
-  }
-  return join(
-    __dirname,
-    'generated',
-    implementation.name,
-    implementation.version,
-    dirName,
-  );
+const writeJsonFile = async (filePath: string, contents: any) => {
+  await ensureDir(dirname(filePath));
+  await promisify(writeFile)(filePath, JSON.stringify(contents, null, 2));
 };
 
-const parseMethodDirName = (methodDirName: string) => {
-  const [kebabCasedMethod, paramsString] = methodDirName.split('_');
-  const params: {  } = paramsString ? 
-  return {
-    kebabCasedMethod,
-    params,
-  }
+const readJsonFile = async (filePath: string) => {
+  const fileContents = await promisify(readFile)(filePath, {
+    encoding: 'utf8',
+  });
+  return JSON.parse(fileContents);
 };
 
-const readMethodExamplesJson = async (methodDir: string) => {
-  const examplesFilePath = join(methodDir, 'examples.json');
+const getMethodExamplesFilePath = (methodId: MethodId) => {
+  const { methodName, implementationName, implementationVersion } = methodId;
+  const methodDir = join(EXAMPLES_DIR, methodName);
+  const fileName = `${implementationName}-${implementationVersion}.json`;
+  return join(methodDir, fileName);
+};
+
+const readMethodExamples = async (methodId: MethodId) => {
+  const examplesJsonPath = getMethodExamplesFilePath(methodId);
   let examples: Example[] = [];
   try {
-    const examplesFileContents = await promisify(readFile)(examplesFilePath, {
-      encoding: 'utf8',
-    });
-    examples = JSON.parse(examplesFileContents);
+    examples = await readJsonFile(examplesJsonPath);
   } catch (ex) {
     if (ex.code !== 'ENOENT') {
       throw ex;
@@ -121,39 +114,68 @@ const readMethodExamplesJson = async (methodDir: string) => {
   return examples;
 };
 
-const writeMethodExamplesJson = async (methodDir: string, examples: Example[]) => {
-  const examplesFilePath = join(methodDir, 'examples.json');
-  await ensureDir(methodDir);
-  await promisify(writeFile)(examplesFilePath, JSON.stringify(examples, null, 2));
+const readAllExamples = async () => {
+  const methodNames = await promisify(readdir)(EXAMPLES_DIR);
+  const allExamples: Example[] = [];
+  for (const methodName of methodNames) {
+    const methodDir = join(EXAMPLES_DIR, methodName);
+    const fileNames = await promisify(readdir)(methodDir);
+    for (const fileName of fileNames) {
+      const filePath = join(methodDir, fileName);
+      const examples = await readJsonFile(filePath);
+      allExamples.push(...examples);
+    }
+  }
+  return allExamples;
 };
 
-const writeMethodIndexTs = async (methodDir: string) => {
-  const examplesFilePath = join(methodDir, 'examples.json');
+const writeMethodExamples = async (methodId: MethodId, examples: Example[]) => {
+  const examplesJsonPath = getMethodExamplesFilePath(methodId);
+  await writeJsonFile(examplesJsonPath, examples);
+};
+
+const writeMethodIndexTs = async (methodId: MethodId) => {
+  const examples = await readMethodExamples(methodId);
+  const successExamples = examples.filter(example => !example.response.error);
+  const hasParams = !successExamples.every(example => !example.request.params);
+  const paredExamples = successExamples.map(example => {
+    return {
+      params: example.request.params,
+      result: example.response.result,
+    };
+  });
+
+  const { methodName, implementationName, implementationVersion } = methodId;
+  const tmpJsonFilePath = join(
+    TMP_DIR,
+    `${methodName}-${implementationName}-${implementationVersion}.json`,
+  );
+  await ensureDir(dirname(tmpJsonFilePath));
+  await promisify(writeFile)(tmpJsonFilePath, JSON.stringify(paredExamples, null, 2));
+  const pascalCasedMethodName = pascalCase(methodId.methodName);
   const { stdout: quicktypeOutput } = await promisify(execFile)('quicktype', [
     '--src',
-    examplesFilePath,
+    tmpJsonFilePath,
     '--src-lang',
     'json',
     '--lang',
     'ts',
     '--just-types',
+    '--top-level',
+    pascalCasedMethodName,
   ]);
-  const transformedQuicktypeOutput = quicktypeOutput
-    .replace(/export interface (.*) {/g, 'export type $1 = {')
-    .replace(/Examples/g, 'Example')
+  let fileContents = quicktypeOutput
+    .replace(/export interface (.*) {/g, 'type $1 = {')
     .replace(/verbosity: number;/g, '// Note: verbosity has special handling')
     .replace(/verbose: number;/g, '// Note: verbose has special handling');
-  const indexFileContents = [
-    doNotEditWarning,
-    '',
-    "import * as examplesJson from './examples.json';",
-    'export const examples: Example[] = examplesJson;',
-    '',
-    transformedQuicktypeOutput,
-  ].join('\n');
-  const indexFilePath = join(methodDir, 'index.ts');
-  await promisify(writeFile)(indexFilePath, indexFileContents);
-  await fix(indexFilePath);
+  fileContents += `
+    export type ${pascalCasedMethodName}Result = ${pascalCasedMethodName}['result'];`;
+  if (hasParams) {
+    fileContents += `
+      export type ${pascalCasedMethodName}Params = ${pascalCasedMethodName}['params'];`;
+  }
+  const indexFilePath = join(TMP_DIR, 'index.ts');
+  await writeTsFile(indexFilePath, fileContents);
 };
 
 const writeImplementationIndexTs = async (implementationDir: string) => {
@@ -165,61 +187,65 @@ const writeImplementationIndexTs = async (implementationDir: string) => {
     const exportString = `export { ${pascalCasedDirName} };`;
     return `${importString}\n${exportString}`;
   });
-  const indexFileContents = `${doNotEditWarning}\n\n${indexFileItems.join('\n')}\n`;
+  const indexFileContents = `${indexFileItems.join('\n')}\n`;
   const indexFilePath = join(implementationDir, 'index.ts');
-  await promisify(writeFile)(indexFilePath, indexFileContents);
-  await fix(indexFilePath);
+  await writeTsFile(indexFilePath, indexFileContents);
 };
 
-class DevClient {
-  private readonly jsonRpcClient: JsonRpcClient;
-  constructor() {
-    const { regtest } = readBitcoinConfSync();
-    if (!isEnabled(regtest)) {
-      throw new Error('Bitcoin server software must be running in "regtest" mode');
-    }
-    const href = readBitcoinRpcHrefSync();
-    this.jsonRpcClient = new JsonRpcClient(href);
-  }
-
-  public async upsertExample(kebabCasedMethod: string, params?: JsonRpcParams) {
-    const { subversion } = await this.jsonRpcClient.rpc('getnetworkinfo');
-    const implementation = parseSubversion(subversion);
-    const methodDir = getMethodDir(implementation, kebabCasedMethod, params);
-    const examples = await readMethodExamplesJson(methodDir);
-    const existingExample = examples.find(example => isEqual(example.params, params));
-    if (!existingExample) {
-      const result = await this.jsonRpcClient.rpc(methodCase(kebabCasedMethod), params);
-      examples.push({
-        params,
-        result,
-      });
-      await writeMethodExamplesJson(methodDir, examples);
-      await writeMethodIndexTs(methodDir);
-    }
-  }
-
-  // public async updateAll() {
-  //   const fileNames = await readdir(__dirname);
-  //   const dirNames = fileNames.filter(fileName => fileName !== 'index.ts');
-  //   for (const dirName of dirNames) {
-  //     const examples = await readExamplesJson(dirName);
-  //     for (const example of examples) {
-  //       await this.upsertExample(dirName, example.request);
-  //     }
-  //   }
-  //   const indexFileItems = dirNames.map(dirName => {
-  //     const pascalCasedDirName = pascalCase(dirName);
-  //     const importString = `import * as ${pascalCasedDirName} from "./${dirName}";`;
-  //     const exportString = `export { ${pascalCasedDirName} };`;
-  //     return `${importString}\n${exportString}`;
-  //   });
-  //   const indexFileContents = `${doNotEditWarning}\n\n${indexFileItems.join('\n')}\n`;
-  //   const indexFilePath = join(__dirname, 'index.ts');
-  //   await writeFile(indexFilePath, indexFileContents);
-  //   await fix(indexFilePath);
-  // }
+const { regtest } = readBitcoinConfSync();
+if (!isEnabled(regtest)) {
+  throw new Error('Bitcoin server software must be running in "regtest" mode');
 }
+const href = readBitcoinRpcHrefSync();
+const jsonRpcClient = new JsonRpcClient(href);
+
+const upsertExample = async (methodName: string, params?: JsonRpcParams) => {
+  const response = await jsonRpcClient.sendRequest({
+    method: 'getnetworkinfo',
+  });
+  if (response.error) {
+    throw new Error(response.error.message);
+  }
+  const { subversion } = response.result;
+  const implementation = parseSubversion(subversion);
+  const methodId: MethodId = { methodName, ...implementation };
+  const examples = await readMethodExamples(methodId);
+  const existingExample = examples.find(example =>
+    isEqual(example.request.params, params),
+  );
+  if (!existingExample) {
+    const request: JsonRpcRequest = {
+      method: methodCase(methodName),
+      params,
+    };
+    const response = await jsonRpcClient.sendRequest(request);
+    examples.push({
+      methodId,
+      info: {
+        subversion,
+      },
+      request,
+      response,
+    });
+    await writeMethodExamples(methodId, examples);
+  }
+};
+
+const upsertAllExamples = async () => {
+  const allExamples = await readAllExamples();
+  const argObjects = uniqWith(
+    allExamples.map(
+      example => ({
+        methodName: example.methodId.methodName,
+        params: example.request.params,
+      }),
+      isEqual,
+    ),
+  );
+  for (const argObject of argObjects) {
+    await upsertExample(argObject.methodName, argObject.params);
+  }
+};
 
 const runAndExit = async (func: () => Promise<void>) => {
   try {
@@ -234,12 +260,15 @@ const runAndExit = async (func: () => Promise<void>) => {
 
 if (require.main === module) {
   runAndExit(async () => {
-    const client = new DevClient();
-    await client.upsertExample('get-best-block-hash');
-    // await client.upsertExample('get-block', {
-    //   verbosity: 2,
-    //   blockhash: '0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206',
+    // await readAllExamples();
+    await upsertAllExamples();
+    // await upsertExample('get-block-hash', {
+    //   height: 0,
     // });
-    await writeImplementationIndexTs(join(__dirname, 'generated', 'abc', 'v0-18'));
+    // await writeMethodIndexTs({
+    //   methodName: 'get-block-hash',
+    //   implementationName: 'abc',
+    //   implementationVersion: 'v0-18',
+    // });
   });
 }
