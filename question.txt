@@ -1,0 +1,18 @@
+I'm writing a Bitcoin RPC client library for my favorite language/platform, and I want to offer my users a "zero configuration" mode similar to how `bitcoin-cli` "just works" if it's co-located with `bitcoind`. I started writing a function to automagically infer a valid RPC username, password, and port. Turns out, however, that the RPC configuration logic is pretty complex these days between INI "sections", `include`s, and "cookie-based" auth. Hundreds of lines of code later it occurred to me that it would be way easier to just spawn `bitcoin-cli`, which already knows how to navigate all that configuration logic. For my automagic mode, it would be great if there were an RPC `getrpcinfo` with result, for example:
+```
+{
+  "rpcuser": "__cookie__",
+  "rpcpassword": "abc123",
+  "rpcport": "18332"
+}
+```
+
+The idea there would be that if the user instantiates my client library in automagic mode, it'd spawn `bitcoin-cli` once to get that connection information. 
+
+This is working kinda ok except for the fact that `bitcoin-cli` pretty-prints the JSON-RPC response. In the case of an error the output looks like 
+```
+error code: -5
+error message:
+Block not found
+```
+On successful response, `bitcoin-cli` outputs just the "result" stripped of the JSON type information (number/string/object/array) that was present in the full response body. 

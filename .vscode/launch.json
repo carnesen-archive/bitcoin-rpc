@@ -7,11 +7,29 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Launch tests",
       "program": "${workspaceFolder}/node_modules/.bin/ts-node",
       "args": [
-        "src/dev.ts"
+        "${workspaceFolder}/node_modules/.bin/jest"
       ]
-    }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch example",
+      "program": "${workspaceFolder}/node_modules/.bin/ts-node",
+      "args": [
+        "src/example.ts"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch server",
+      "program": "${workspaceFolder}/node_modules/.bin/ts-node",
+      "args": [
+        "src/server.ts"
+      ]
+    },
   ]
 }

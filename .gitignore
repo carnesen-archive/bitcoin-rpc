@@ -1,8 +1,5 @@
 ### Node ###
 
-# TODO: Remove this when dependencies have stabilized
-package-lock.json*
-
 # Logs
 logs
 npm-debug.log*
