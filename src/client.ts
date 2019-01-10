@@ -1,15 +1,16 @@
 import * as http from 'http';
-import { CodedError } from './error';
-import { RpcRequest, RpcResponse, RpcParams, RpcOptions } from './types';
+import { CodedError } from '@carnesen/coded-error';
+import { runAndExit } from '@carnesen/run-and-exit';
+import { RpcRequest, RpcResponse } from './types';
+import { URL } from 'url';
 
-const sendData = (options: RpcOptions, data: string): Promise<string> => {
+const sendData = (href: string, data: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const { rpcuser, rpcpassword, rpcconnect = '127.0.0.1', rpcport } = options;
-
+    const url = new URL(href);
     const req = http.request({
-      hostname: rpcconnect,
-      port: rpcport,
-      auth: `${rpcuser}:${rpcpassword}`,
+      hostname: url.hostname,
+      port: url.port,
+      auth: `${url.username}:${url.password}`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -44,9 +45,9 @@ const sendData = (options: RpcOptions, data: string): Promise<string> => {
   });
 };
 
-const sendRequest = async (options: RpcOptions, request: RpcRequest) => {
+const sendRequest = async (href: string, request: RpcRequest) => {
   const data = JSON.stringify(request);
-  const responseData = await sendData(options, data);
+  const responseData = await sendData(href, data);
   let response: RpcResponse;
   try {
     response = JSON.parse(responseData);
@@ -56,20 +57,26 @@ const sendRequest = async (options: RpcOptions, request: RpcRequest) => {
   return response;
 };
 
-export const createRpc = (options: RpcOptions) => async (
-  method: string,
-  params?: RpcParams,
-) => {
-  const response = await sendRequest(options, {
-    method,
-    params,
-    id: Math.random()
-      .toString(36)
-      .slice(2),
-  });
-  const { error, result } = response;
-  if (error) {
-    throw new CodedError(error.message, error.code, error.data);
+const getRandomId = () =>
+  Math.random()
+    .toString(36)
+    .slice(2);
+
+export function createBitcoinRpc(href: string) {
+  async function bitcoinRpc(method: string, params?: RpcRequest['params']) {
+    const response = await sendRequest(href, {
+      method,
+      params,
+      id: getRandomId(),
+    });
+    const { error, result } = response;
+    if (error) {
+      throw new CodedError(error.message, error.code, error.data);
+    }
+    return result;
   }
-  return result;
-};
+  return bitcoinRpc;
+}
+
+const bitcoinRpc = createBitcoinRpc('http://carnesen:12345678@localhost:18440');
+runAndExit(() => bitcoinRpc('getbestblockhash'));

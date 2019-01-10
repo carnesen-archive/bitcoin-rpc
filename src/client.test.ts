@@ -1,6 +1,7 @@
-import { createRpc } from './client';
-import { RpcServer } from './server';
-import { RpcOptions } from './types';
+import { createBitcoinRpc } from './bitcoin-rpc';
+import { createBitcoinCliRpc } from './bitcoin-cli';
+import { RpcServer, ERROR_CODES } from './server';
+import { RpcOptions, BitcoinRpc } from './types';
 
 const options: RpcOptions = {
   rpcport: '55438',
@@ -8,13 +9,25 @@ const options: RpcOptions = {
   rpcpassword: 'not a real password',
 };
 
-const rpc = createRpc(options);
+const bitcoinRpc = createBitcoinRpc(options);
+const bitcoinCliRpc = createBitcoinCliRpc(options);
 const server = new RpcServer(options);
 
-describe('BitcoinRpcClient#rpc', () => {
+const testBoth = (name: string, func: (sendRpcX: BitcoinRpc) => any) => {
+  [bitcoinRpc, bitcoinCliRpc].forEach(sendRpcX => {
+    it(`${sendRpcX.name}: ${name}`, () => func(sendRpcX));
+  });
+};
+
+describe('sendRpc', () => {
   beforeAll(() => server.start());
   afterAll(() => server.stop());
-  it('resolves a string', async () => {
-    await rpc('foo');
+  testBoth('rejects a coded error if server returns an RpcError', async sendRpcX => {
+    try {
+      await sendRpcX('not a real method name');
+      throw new Error('This line should not be reached');
+    } catch (ex) {
+      expect(ex.code).toBe(ERROR_CODES.METHOD_NOT_FOUND);
+    }
   });
 });

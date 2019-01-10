@@ -1,8 +1,10 @@
 type RpcPositionalParams = any[];
+
 type RpcNamedParams = {
   [name: string]: any;
 };
-export type RpcParams = RpcPositionalParams | RpcNamedParams;
+
+type RpcParams = RpcPositionalParams | RpcNamedParams;
 
 type RpcId = null | number | string;
 
@@ -23,11 +25,4 @@ export type RpcResponse = {
   result: any;
   error: null | RpcError;
   id?: RpcId;
-};
-
-export type RpcOptions = {
-  rpcuser: string;
-  rpcpassword: string;
-  rpcport: string;
-  rpcconnect?: string;
 };
