@@ -1,6 +1,5 @@
 import * as http from 'http';
 import { CodedError } from '@carnesen/coded-error';
-import { runAndExit } from '@carnesen/run-and-exit';
 import { RpcRequest, RpcResponse } from './types';
 import { URL } from 'url';
 
@@ -63,7 +62,7 @@ const getRandomId = () =>
     .slice(2);
 
 export function createBitcoinRpc(href: string) {
-  async function bitcoinRpc(method: string, params?: RpcRequest['params']) {
+  return async function bitcoinRpc(method: string, params?: RpcRequest['params']) {
     const response = await sendRequest(href, {
       method,
       params,
@@ -74,9 +73,5 @@ export function createBitcoinRpc(href: string) {
       throw new CodedError(error.message, error.code, error.data);
     }
     return result;
-  }
-  return bitcoinRpc;
+  };
 }
-
-const bitcoinRpc = createBitcoinRpc('http://carnesen:12345678@localhost:18440');
-runAndExit(() => bitcoinRpc('getbestblockhash'));

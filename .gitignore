@@ -1,5 +1,8 @@
 ### Node ###
 
+# Code coverage reports
+/coverage
+
 # Logs
 logs
 npm-debug.log*
