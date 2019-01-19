@@ -3,9 +3,7 @@
   "description": "A Bitcoin remote procedure call (RPC) client",
   "version": "0.0.0-0",
   "main": "lib/index.js",
-  "bin": {
-    "bitcoin-rpc": "lib/cli.js"
-  },
+  "types": "lib/index.d.ts",
   "engines": {
     "node": ">=8.0.0"
   },
@@ -23,11 +21,10 @@
     "postversion": "npm publish"
   },
   "dependencies": {
-    "@carnesen/coded-error": "0.0.0-0"
+    "@carnesen/bitcoin-config": "0.0.0-3",
+    "@carnesen/coded-error": "0.0.0"
   },
   "devDependencies": {
-    "@carnesen/bitcoin-config": "0.0.0-0",
-    "@carnesen/run-and-exit": "0.0.3",
     "@carnesen/tsconfig": "0.0.1",
     "@carnesen/tslint-config": "0.0.3",
     "@types/jest": "23.3.10",

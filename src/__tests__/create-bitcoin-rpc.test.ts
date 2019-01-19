@@ -4,11 +4,6 @@ import { readRpcHref } from '../read-rpc-href';
 const href = readRpcHref();
 const bitcoinRpc = createBitcoinRpc(href);
 
-export const BLOCK_HASH =
-  '0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206';
-
-export const BLOCK_COUNT = 0;
-
 async function catchBitcoinRpc(...args: Parameters<typeof bitcoinRpc>) {
   try {
     await bitcoinRpc(...args);
@@ -27,5 +22,25 @@ describe(bitcoinRpc.name, () => {
   it('getnetworkinfo', async () => {
     const result = await bitcoinRpc('getnetworkinfo');
     expect(typeof result.connections).toBe('number');
+  });
+
+  it('getblockcount', async () => {
+    const result = await bitcoinRpc('getblockcount');
+    expect(typeof result).toBe('number');
+  });
+
+  it('getblockcount', async () => {
+    const result = await bitcoinRpc('getblockcount');
+    expect(typeof result).toBe('number');
+  });
+
+  it('getbestblockhash', async () => {
+    const result = await bitcoinRpc('getbestblockhash');
+    expect(typeof result).toBe('string');
+  });
+
+  it('getblockhash', async () => {
+    const result = await bitcoinRpc('getblockhash', [0]);
+    expect(typeof result).toBe('string');
   });
 });

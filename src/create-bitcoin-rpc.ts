@@ -1,7 +1,9 @@
 import * as http from 'http';
-import { CodedError } from '@carnesen/coded-error';
-import { RpcRequest, RpcResponse } from './types';
 import { URL } from 'url';
+
+import CodedError = require('@carnesen/coded-error');
+
+import { RpcRequest, RpcResponse } from './types';
 
 const sendData = (href: string, data: string): Promise<string> => {
   return new Promise((resolve, reject) => {
