@@ -10,7 +10,8 @@
       "name": "Launch tests",
       "program": "${workspaceFolder}/node_modules/.bin/ts-node",
       "args": [
-        "${workspaceFolder}/node_modules/.bin/jest"
+        "${workspaceFolder}/node_modules/.bin/jest",
+        "src"
       ]
     },
   ]
