@@ -1,7 +1,7 @@
 {
   "name": "@carnesen/bitcoin-rpc",
   "description": "A Bitcoin remote procedure call (RPC) client",
-  "version": "0.0.0-0",
+  "version": "0.0.0",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "engines": {
