@@ -39,6 +39,7 @@ Optional for some methods. An array of positional parameter values or an object 
 `any`. The remote procedure call's result.
 
 ## Related
+- [@carnesen/bitcoin-rpc-href](https://github.com/carnesen/bitcoin-rpc-href): A Node.js library for reading bitcoin's remote procedure call (RPC) configuration
 - [@carnesen/bitcoin-config](https://github.com/carnesen/bitcoin-config): A Node.js library for bitcoin server software configuration
 - [@carnesen/bitcoin-service](https://github.com/carnesen/bitcoin-service): A Node.js library for managing the bitcoin service `bitcoind`
 - [@carnesen/bitcoin-software](https://github.com/carnesen/bitcoin-software): A Node.js library for installing bitcoin server software
