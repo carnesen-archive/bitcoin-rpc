@@ -22,7 +22,7 @@ describe(bitcoinRpc.name, () => {
     await regtestService.start();
     // service takes a little time to bind to the rpc port
     await new Promise(resolve => {
-      setTimeout(resolve, 600);
+      setTimeout(resolve, 3000);
     });
   }, 30000);
 
