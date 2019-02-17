@@ -1,7 +1,12 @@
-import { createBitcoinRpc } from '../create-bitcoin-rpc';
-import { devService } from '../dev-service';
+import { RegtestService } from '@carnesen/bitcoin-regtest-service';
+import { resolve } from 'path';
 
-const bitcoinRpc = createBitcoinRpc(devService.rpcHref);
+import { createBitcoinRpc } from '../create-bitcoin-rpc';
+
+export const datadir = resolve(__dirname, '..', '..', 'tmp');
+export const regtestService = new RegtestService({ datadir });
+
+const bitcoinRpc = createBitcoinRpc(regtestService.rpcHref);
 
 async function catchBitcoinRpc(...args: Parameters<typeof bitcoinRpc>) {
   try {
@@ -14,15 +19,15 @@ async function catchBitcoinRpc(...args: Parameters<typeof bitcoinRpc>) {
 
 describe(bitcoinRpc.name, () => {
   beforeAll(async () => {
-    const { changed } = await devService.start();
-    // server responds 500 if it's still starting up
-    if (changed) {
-      await new Promise(resolve => {
-        setTimeout(resolve, 300);
-      });
-    }
-  });
-  afterAll(() => devService.stop());
+    await regtestService.start();
+    // service takes a little time to bind to the rpc port
+    await new Promise(resolve => {
+      setTimeout(resolve, 300);
+    });
+  }, 30000);
+
+  afterAll(() => regtestService.stop());
+
   it('getnetworkinfo', async () => {
     const result = await bitcoinRpc('getnetworkinfo');
     expect(result.connections).toBe(0);

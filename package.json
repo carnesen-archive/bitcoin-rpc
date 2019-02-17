@@ -12,7 +12,7 @@
     "build:clean": "rimraf lib && npm run build",
     "lint": "tslint --project tsconfig.build.json",
     "lint:fix": "npm run lint -- --fix",
-    "test": "npm run lint && ts-node src/dev-service.ts && npm run test:unit && npm run build",
+    "test": "npm run lint && npm run test:unit && npm run build",
     "test:unit": "jest --coverage src",
     "test:watch": "npm run test:unit -- --watch",
     "preversion": "npm test && npm run build:clean",
@@ -23,8 +23,7 @@
     "@carnesen/coded-error": "0.1.0"
   },
   "devDependencies": {
-    "@carnesen/bitcoin-software": "0.0.2",
-    "@carnesen/run-and-exit": "0.2.0",
+    "@carnesen/bitcoin-regtest-service": "0.0.0",
     "@carnesen/tsconfig": "0.1.0",
     "@carnesen/tslint-config": "0.1.2",
     "@types/jest": "24.0.0",

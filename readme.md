@@ -1,13 +1,6 @@
-# @carnesen/bitcoin-rpc
+# @carnesen/bitcoin-rpc [![npm version](https://badge.fury.io/js/%40carnesen%2Fbitcoin-rpc.svg)](https://badge.fury.io/js/%40carnesen%2Fbitcoin-rpc) [![Build Status](https://travis-ci.org/carnesen/bitcoin-rpc.svg?branch=master)](https://travis-ci.org/carnesen/bitcoin-rpc)
 
-A Node.js client for bitcoin's remote procedure call (RPC) interface
-
-## Install
-
-```
-npm install @carnesen/bitcoin-rpc
-```
-This package includes runtime JavaScript files suitable for Node.js >=8 as well as the corresponding TypeScript type declarations.
+A Node.js client for bitcoin's remote procedure call (RPC) interface. This package includes runtime JavaScript files suitable for Node.js >=8 as well as the corresponding TypeScript type declarations.
 
 ## Usage
 
@@ -29,27 +22,35 @@ bitcoinRpc('getblockhash', { height: 0 })
 
 ## API
 
-### readRpcHref(configFilePath): href
+### `readRpcHref(configFilePath?): href`
 Reads bitcoin configuration files to determine an "href" connection string for the RPC interface. The logic in this function is meant to reproduce as closely as possible that of the `bitcoin-cli` client that ships with the bitcoin server software. Among other things, if the configuration does not contain an `rpcpassword`, that means that "cookie-based" authentication is enabled. In that case `readRpcHref` reads the username and password from the `rpccookiefile` file written to `datadir` on startup.
 
-#### configFilePath
-Optional. String path of a bitcoin configuration file. Default value is the platform-dependent location where bitcoin looks for its config file e.g. `~/.bitcoin/bitcoin.conf` on Linux.
+#### `configFilePath`
+Optional `string`. String path of a bitcoin configuration file. Default value is the platform-dependent location where bitcoin looks for its config file e.g. `~/.bitcoin/bitcoin.conf` on Linux.
 
-#### href
+#### `href`
 A string of the form `http://<username>:<password>@<hostname>:<port>/` as defined by the [WHATWG URL](https://nodejs.org/api/url.html#url_the_whatwg_url_api) standard. The href can be passed to `createBitcoinRpc` to create an RPC client. 
 
-### createBitcoinRpc(href): bitcoinRpc
+### `createBitcoinRpc(href): bitcoinRpc`
 A factory function for creating bitcoin RPC clients
 
-#### href
+#### `href`
 As above ^^
 
-### bitcoinRpc(method, params): result
+### `bitcoinRpc(method, params): Promise<result>`
 This section documents the function returned by `createBitcoinRpc`. 
 
-#### method
+#### `method`
 A string specifying the name of an RPC method, e.g. `getnetworkinfo`.
 
-#### params
+#### `params`
 Optional. An array of positional parameter values for the specified `method` or an object of "named" parameter values, if required by the method.
 
+## Related
+- [@carnesen/bitcoin-config](https://github.com/carnesen/bitcoin-config): A Node.js library for bitcoin server software configuration
+- [@carnesen/bitcoin-service](https://github.com/carnesen/bitcoin-service): A Node.js library for managing the bitcoin service `bitcoind`
+- [@carnesen/bitcoin-software](https://github.com/carnesen/bitcoin-software): A Node.js library for installing bitcoin server software
+
+## License
+
+MIT © [Chris Arnesen](https://www.carnesen.com)
